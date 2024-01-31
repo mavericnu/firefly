@@ -1,0 +1,30 @@
+1.  One frame: success
+2.  RX_OVERSAMPLE_RATE = 17 leading rx clock: success, due to tolerance, correct data read out during done signal before output cleared
+3.  RX_OVERSAMPLE_RATE = 13 lagging rx clock: fail xaction, bits way out of sync, incorrect data read out
+4.  Two frames: success, with second outputs shortened due to external reset
+5.  Two frames, RX_OVERSAMPLE_RATE = 17: success for first, fail xaction for second
+6.  Two frames, interrupted transmit followed by complete transmit: success (*shows tx start can come before en to start a transmit)
+7.  Two frames, interrupted transmit followed by complete transmit: success (*shows tx start can come before en and even during previous transmit)
+8.  Two frames, interrupted transmit followed by transmit attempt: fail to start second xaction due to tx start being too short after en
+9.  Two frames continuous (no low-going tx start): success (*shows third transmit starting, because low-going tx start is too late at end of second xaction)
+10. Two frames continuous (no low-going tx start): success (*shows acceptance of second transmit data (in) on high-going done)
+11. Two frames continuous (no low-going tx start): fail to set up new data (in) before high-going done in time for second transmit (*and shows third transmit starting, because low-going tx start is too late)
+12. Two frames continuous, TURBO_FRAMES = 1: success (*max bandwidth because data (in) is ready to transmit immediately when done signal goes low)
+13. 20 frames continuous, TURBO_FRAMES = 0: success
+14. 20 frames continuous, TURBO_FRAMES = 1: success
+15. 20 frames continuous, TURBO_FRAMES = 1: fail at bytes 99 (after 0) and 7 (after 149) because setup is not fast enough for the rate
+16. Partial frame, focusing on start bit after a high signal of minimal length: 4 ticks: success
+17. Partial frame, focusing on start bit after a high signal of minimal length: 3 ticks: fail to start until a later bit, because high signal time before start bit is not met (*shows err and reset err)
+18. Partial frame, focusing on start bit after a high signal of minimal length: 4 ticks: fail to start until a later bit, because start bit signal time is not met after the high signal time is met (*shows err and reset err)
+19. Partial frame, focusing on start bit low-high-low false signal: fail to start until a later bit, after high signal time is met (*shows err and reset err)
+20. One frame, stop bit glitch high-low-high but then stable: success
+21. One frame, stop bit glitch high-low-high starting in first half continuing to second half, then stable: success
+22. Incomplete xaction due to stop bit "did not go high or remain high" while waiting till after mid-point: fail to accept (*shows err sustained for 16-tick cycle)
+23. Error signal sustained when transitioning to IDLE state in error condition because there was no rx stop signal: success
+24. Error signal in IDLE state as long as rx has not been driven high, when no transmit is started: success
+25. One frame, and next xaction starts after minimum required length of stop bit (no READY state): success (*shows done sustained for 16-tick cycle)
+26. Error at beginning of next xaction due to rx start signal not meeting its requirement: success accepting previous xaction (*shows done sustained for 16-tick cycle, shows err can overlap)
+27. One frame, and next xaction starts during the READY state: success
+28: One frame, and next xaction starts on very last tick of the READY state: success (*shows done sustained for 16-tick cycle)
+29. Error at beginning of next xaction due to rx start signal not long enough to meet its extra hold requirement: success accepting previous xaction (*shows done, shows err)
+30. Error at end of xaction held over to beginning of next xaction: fail to accept, fail to start (*shows err sustained high, no glitch low-high)
