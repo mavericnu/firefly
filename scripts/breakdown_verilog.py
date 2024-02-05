@@ -1,14 +1,14 @@
 # Copyright (c) 2024 Maveric @ NU and Texer.ai.
 # All rights reserved.
-import re
-import sys
 
-file_path = sys.argv[1]
+# TODOs:
+# 1. Update parse_verilog() to handle processsing multiple files.
 
 def read_verilog_file(file_path):
     with open(file_path, 'r') as file:
         lines = file.readlines()
     return lines
+
 
 def extract_assign_and_always_blocks(lines):
     assign_statements = []
@@ -45,20 +45,26 @@ def extract_assign_and_always_blocks(lines):
 
     return assign_statements, always_blocks
 
-def main(file_paths):
+
+def print_assign_and_always_blocks(assign_statements, always_blocks):
+    print("Assigns:")
+    print("-----------------------------")
+    for statement in assign_statements:
+        print(statement)
+
+    print("\nAlways blocks:")
+    print("-----------------------------")
+    for block in always_blocks:
+        print(block)
+
+
+def parse_verilog(file_paths):
     for path in file_paths:
-        lines = read_verilog_file(file_path)
-        assign_statements, always_blocks = extract_assign_and_always_blocks(lines)
+        lines = read_verilog_file(path)
+        assign_statements, always_blocks = extract_assign_and_always_blocks(
+            lines)
 
         # Print.
-        print("Assigns:")
-        print("-----------------------------")
-        for statement in assign_statements:
-            print(statement)
+        # print_assign_and_always_blocks(assign_statements, always_blocks)
 
-        print("\nAlways blocks:")
-        print("-----------------------------")
-        for block in always_blocks:
-            print(block)
-
-main([file_path])
+    return assign_statements, always_blocks
