@@ -1,11 +1,9 @@
 # Copyright (c) 2024 Maveric @ NU and Texer.ai.
 # All rights reserved.
 
-# TODOs
-# 1. Update system INSTRUCTIONS to standardize model responses.
-
 import os
 import re
+import json
 from openai import OpenAI
 
 client = OpenAI(
@@ -13,24 +11,25 @@ client = OpenAI(
 )
 
 PROMPT = (
-    'I am preparing an exam. Please, add ONE bug in the provided Verilog code so students ' +
-    'can find it during the exam. Make the bug a typical human engineering error:\n'
+    'I am creating an exam. Please, add one bug in the provided Verilog code ' +
+    'so people can find it during the exam. Make the bug a typical human ' +
+    'engineering error. Return an answer in JSON format. The first key must be ' +
+    '"description" with an extensive description of the proposed bug. The second ' +
+    'key must be "code" with the updated buggy code:\n'
 )
 
 INSTRUCTIONS = (
-    'You are a helpful assistant. ' +
-    'If provided with a block of code always return the updated version of it.'
+    '- Be highly organized;\n' +
+    '- Be proactive and anticipate my needs;\n' +
+    '- Mistakes erode my trust, so be accurate and thorough;\n' +
+    '- If provided with a block of code always return the updated version of it.'
 )
 
 
 def parse_response(response):
-    # Regex to extract a code block enclosed in triple backticks (```).
-    matches = re.findall(r'```(?:\w+\s+)?(.*?)```', response, re.DOTALL)
-    if matches:
-        extracted_code_block = matches[0]
-        return extracted_code_block
-    else:
-        return "No code block found."
+    r = json.loads(response)
+    description, code = r["description"], r["code"]
+    return description, code
 
 
 def request_bug(code_block):
@@ -47,8 +46,9 @@ def request_bug(code_block):
             }
 
         ],
-        model="gpt-3.5-turbo",
+        model="gpt-3.5-turbo-1106",
+        response_format={"type": "json_object"},
     )
     response = completion.choices[0].message.content
-    bug_description, updated_code_block = response, parse_response(response)
+    bug_description, updated_code_block = parse_response(response)
     return bug_description, updated_code_block
