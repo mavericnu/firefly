@@ -11,7 +11,7 @@ file_path = sys.argv[1]
 
 def main():
     assign_statements, always_blocks = parse_verilog([file_path])
-    original_code_block = always_blocks[1]
+    original_code_block = assign_statements[1]
     description, updated_code_block = request_bug(original_code_block)
     
     print("-------- ORIGINAL CODE: --------")
