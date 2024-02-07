@@ -40,9 +40,9 @@ INSTRUCTIONS = {
         'Verilog code snippet provided by me. I am preparing quiz questions for the exam. ' +
         'I want you to implement a human engineering bug, so students can identify them.\n' +
         '\n' +
-        'Return result only in JSON format: with properties original, modified, and error ' +
-        'description. Consistency of JSON result is important since I will later upload it ' +
-        'on an exam taking platform, which requires JSON. !Important! Return only JSON ' +
-        'result, no extra text.'
+        'Return result only in JSON format: with properties updated_code (modified code) and ' +
+        'description (bug description). Consistency of JSON result is important since I will ' +
+        'later upload it on an exam taking platform, which requires JSON. ' +
+        '!Important! Return only JSON result, no extra text.'
     )
 }
