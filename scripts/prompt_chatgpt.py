@@ -5,40 +5,27 @@ import os
 import re
 import json
 from openai import OpenAI
+from constants import PROMPTS, INSTRUCTIONS
 
 client = OpenAI(
     api_key=os.environ.get("OPENAI_API_KEY"),
 )
 
-PROMPT = (
-    'I am creating an exam. Please, add one bug in the provided Verilog code ' +
-    'so people can find it during the exam. Make the bug a typical human ' +
-    'engineering error. Return an answer in JSON format. The first key must be ' +
-    '"description" with an extensive description of the proposed bug. The second ' +
-    'key must be "code" with the updated buggy code:\n'
-)
-
-INSTRUCTIONS = (
-    '- Be highly organized;\n' +
-    '- Be proactive and anticipate my needs;\n' +
-    '- Mistakes erode my trust, so be accurate and thorough;\n' +
-    '- If provided with a block of code always return the updated version of it.'
-)
-
 
 def parse_response(response):
     r = json.loads(response)
-    description, code = r["description"], r["code"]
-    return description, code
+    code, description =  r["updated_code"], r["description"]
+    return code, description 
 
 
 def request_bug(code_block):
-    prompt = PROMPT + '"\n' + code_block + '\n"'
+    instruction = INSTRUCTIONS['general']
+    prompt = PROMPTS['detailed'].format(code_block)
     completion = client.chat.completions.create(
         messages=[
             {
                 "role": "system",
-                "content": INSTRUCTIONS,
+                "content": instruction,
             },
             {
                 "role": "user",
@@ -46,9 +33,9 @@ def request_bug(code_block):
             }
 
         ],
-        model="gpt-3.5-turbo-1106",
+        model="gpt-4-1106-preview",
         response_format={"type": "json_object"},
     )
     response = completion.choices[0].message.content
-    bug_description, updated_code_block = parse_response(response)
-    return bug_description, updated_code_block
+    updated_code, bug_description = parse_response(response)
+    return updated_code, bug_description
