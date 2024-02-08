@@ -2,7 +2,7 @@
 # All rights reserved.
 
 # TODOs:
-# 1. Update parse_verilog() to handle processsing multiple files.
+# 1. Update parse_verilog() to handle processsing multiple files. (?)
 
 def read_verilog_file(file_path):
     with open(file_path, 'r') as file:
@@ -11,22 +11,23 @@ def read_verilog_file(file_path):
 
 
 def extract_assign_and_always_blocks(lines):
-    assign_statements = []
-    always_blocks = []
+    assign_statements = {}
+    always_blocks = {}
     inside_always = False
     nesting_level = 0
     current_always_block = []
 
-    for line in lines:
+    for line_number, line in enumerate(lines, start=1):
         # Check for assign statements.
         if line.strip().startswith('assign'):
-            assign_statements.append(line.strip())
+            assign_statements[line_number] = line.strip()
             continue
 
         # Check for start of always block.
         if 'always' in line:
             inside_always = True
             current_always_block.append(line.strip())
+            always_start = line_number
             continue
 
         # If inside always block, process the line.
@@ -40,7 +41,8 @@ def extract_assign_and_always_blocks(lines):
                 else:
                     # End of always block.
                     inside_always = False
-                    always_blocks.append('\n'.join(current_always_block))
+                    always_blocks[always_start] = '\n'.join(
+                        current_always_block)
                     current_always_block = []
 
     return assign_statements, always_blocks
