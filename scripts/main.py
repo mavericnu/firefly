@@ -24,8 +24,21 @@ def reconstruct_verilog(init_index, original_code, updated_code, upd_index):
     with open(file_path, 'r') as file:
         lines = file.readlines()
 
-    lines[init_index + upd_index] = lines[init_index +
-                                          upd_index].replace(original_code, updated_code)
+    updated_code_lines = updated_code.split('\n')
+    n = len(updated_code_lines)
+
+    if n == 1:
+        if lines[init_index + upd_index].find(original_code) != -1:
+            print("[ REPLACEMENT SUCCESSFUL ]\n")
+        else:
+            print("[ REPLACEMENT UNSUCCESSFUL]\n")
+            print("Searching for: ", original_code)
+            print("Real line: ", lines[init_index + upd_index])
+            return
+        lines[init_index + upd_index] = lines[init_index +
+                                              upd_index].replace(original_code, updated_code)
+    # else:
+
     f = open(file_name, 'w')
     f.writelines(lines)
     f.close()
@@ -34,14 +47,33 @@ def reconstruct_verilog(init_index, original_code, updated_code, upd_index):
 def main():
     assign_statements, always_blocks = parse_verilog([file_path])
 
-    test_assign = list(assign_statements.items())[0]
+    # print(assign_statements.keys())
+
+    # test_assign = list(assign_statements.items())[2]
+    # original_code, updated_code, line_number, bug_description = request_bug(
+    #     test_assign[1])
+
+    # reconstruct_verilog(
+    #     test_assign[0] - 1, original_code, updated_code, line_number - 1)
+
+    print(always_blocks.keys())
+    print()
+
+    test_always = list(always_blocks.items())[4]
     original_code, updated_code, line_number, bug_description = request_bug(
-        test_assign[1])
+        test_always[1])
 
     reconstruct_verilog(
-        test_assign[0] - 1, original_code, updated_code, line_number - 1)
+        test_always[0] - 1, original_code, updated_code, line_number - 1)
 
-    # test_always = list(always_blocks.items())[0]
+    print("ORIGINAL CODE:")
+    print(original_code)
+    print()
+    print("UPDATED CODE:")
+    print(updated_code)
+    print()
+    print("BUG DESCRIPTION:")
+    print(bug_description)
 
 
 main()

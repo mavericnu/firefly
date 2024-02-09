@@ -56,6 +56,8 @@ INSTRUCTIONS = {
         '(the exact line number of the original code from which you start modifying it) and ' +
         'description (extensive bug description). Consistency of JSON result is important ' +
         'since I will later upload it on an exam taking platform, which requires JSON. ' +
-        '!Important! Return only JSON result, no extra text.'
+        '!Important! Return only JSON result, no extra text. ' +
+        '!Important! Return multiple lines of code only if you modify multiple lines of original ' +
+        'code or if you add new lines. In any other cases, try to return the exact single line of code.'
     )
 }
