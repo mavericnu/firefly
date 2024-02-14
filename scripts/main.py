@@ -16,7 +16,7 @@ file_path = sys.argv[1]
 def main():
     assign_statements, always_blocks = parse_verilog([file_path])
 
-    i = 4
+    i = 0
 
     # test_assign = list(assign_statements.items())[i]
     # original_code, updated_code, line_number, bug_description = request_bug(

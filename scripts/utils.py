@@ -33,8 +33,8 @@ def reconstruct_verilog(file_path, init_index, original_code, updated_code, upd_
 
 
 def replace_file(file_path):
-    file_name = file_path.split('/')[-1]
-    cmd1 = ['mv', '../uart-verilog/' + file_name, '../original-files/']
-    cmd2 = ['mv', file_name, '../uart-verilog/']
+    fp_splitted = file_path.split('/')
+    cmd1 = ['mv', file_path, '../original-files/']
+    cmd2 = ['mv', fp_splitted[-1], '/'.join(fp_splitted[:-1])]
     subprocess.run(cmd1)
     subprocess.run(cmd2)
