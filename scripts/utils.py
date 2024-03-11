@@ -1,7 +1,9 @@
 # Copyright (c) 2024 Maveric @ NU and Texer.ai.
 # All rights reserved.
 
+import os
 import subprocess
+from breakdown_verilog import parse_verilog
 
 
 def reconstruct_verilog(file_path, init_index, original_code, updated_code, upd_index):
@@ -38,3 +40,15 @@ def replace_file(file_path):
     cmd2 = ['mv', fp_splitted[-1], '/'.join(fp_splitted[:-1])]
     subprocess.run(cmd1)
     subprocess.run(cmd2)
+
+
+def process_files(directory):
+    results = dict()
+    for root, dirs, files in os.walk(directory):
+        for file in files:
+            if file.endswith(".v") or file.endswith(".sv"):
+                file_path = os.path.join(root, file)
+                print(f"Processing file: {file_path}")
+                assign_statements, always_blocks = parse_verilog(file_path)
+                results[file_path] = (assign_statements, always_blocks)
+    return results

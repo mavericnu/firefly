@@ -1,6 +1,10 @@
 # API Keys
 .setup_keys.sh
 
+# Local folders
+dut
+original-files
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]

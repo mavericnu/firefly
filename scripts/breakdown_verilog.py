@@ -1,9 +1,6 @@
 # Copyright (c) 2024 Maveric @ NU and Texer.ai.
 # All rights reserved.
 
-# TODOs:
-# 1. Update parse_verilog() to handle processsing multiple files. (?)
-
 def read_verilog_file(file_path):
     with open(file_path, 'r') as file:
         lines = file.readlines()
@@ -60,13 +57,10 @@ def print_assign_and_always_blocks(assign_statements, always_blocks):
         print(block)
 
 
-def parse_verilog(file_paths):
-    for path in file_paths:
-        lines = read_verilog_file(path)
-        assign_statements, always_blocks = extract_assign_and_always_blocks(
-            lines)
+def parse_verilog(file_path):
+    lines = read_verilog_file(file_path)
+    assign_statements, always_blocks = extract_assign_and_always_blocks(
+        lines)
 
-        # Print.
-        # print_assign_and_always_blocks(assign_statements, always_blocks)
-
+    # print_assign_and_always_blocks(assign_statements, always_blocks)
     return assign_statements, always_blocks

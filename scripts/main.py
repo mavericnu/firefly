@@ -4,6 +4,10 @@
 # TODOs:
 # 1. Handle large files. (?)
 
+# NOTEs:
+# 1. LLM might response with a syntactically incorrect original code
+# (e.g., did not include one of the brackets) => script cannot find/replace the original code.
+
 import sys
 
 from prompt_chatgpt import request_bug
@@ -16,7 +20,7 @@ file_path = sys.argv[1]
 def main():
     assign_statements, always_blocks = parse_verilog([file_path])
 
-    i = 0
+    i = 1
 
     # test_assign = list(assign_statements.items())[i]
     # original_code, updated_code, line_number, bug_description = request_bug(
