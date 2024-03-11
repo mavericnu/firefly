@@ -57,10 +57,38 @@ def print_assign_and_always_blocks(assign_statements, always_blocks):
         print(block)
 
 
-def parse_verilog(file_path):
+def parse_verilog_file(file_path):
     lines = read_verilog_file(file_path)
     assign_statements, always_blocks = extract_assign_and_always_blocks(
         lines)
 
     # print_assign_and_always_blocks(assign_statements, always_blocks)
     return assign_statements, always_blocks
+
+
+def reconstruct_verilog_file(file_path, init_index, original_code, updated_code, upd_index):
+    file_name = file_path.split('/')[-1]
+    f = open(file_name, 'w')
+    try:
+        with open(file_path, 'r') as file:
+            lines = file.readlines
+        index = init_index + upd_index
+        if lines[index].find(original_code) == -1:
+            print(
+                "[ Replacement using lines is unsuccessful. Trying another method... ]")
+            # print("Looked for: ", original_code)
+            # print("Found: ", lines[index])
+            raise Exception('')
+        lines[index] = lines[index].replace(original_code, updated_code)
+        f.writelines(lines)
+    except:
+        with open(file_path, 'r') as file:
+            file_content = file.read()
+        if file_content.find(original_code) == -1:
+            print("[ Replacement using the whole file is also unsuccessful ]")
+            f.close()
+            return
+        file_content = file_content.replace(original_code, updated_code, 1)
+        f.write(file_content)
+    f.close()
+    print("[ SUCCESS ]")

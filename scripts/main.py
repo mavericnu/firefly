@@ -2,15 +2,15 @@
 # All rights reserved.
 
 import sys
-from prompt_chatgpt import request_bug
-from breakdown_verilog import parse_verilog
+from prompt_gpt import request_bug
+from verilog_operations import *
 from utils import *
 
 
 def main():
     # file_path = sys.argv[1]
 
-    # assign_statements, always_blocks = parse_verilog(file_path)
+    # assign_statements, always_blocks = parse_verilog_file(file_path)
 
     # i = 1
 
@@ -18,7 +18,7 @@ def main():
     # original_code, updated_code, line_number, bug_description = request_bug(
     #     test_assign[1])
 
-    # reconstruct_verilog(file_path, test_assign[0] - 1,
+    # reconstruct_verilog_file(file_path, test_assign[0] - 1,
     #                     original_code, updated_code, line_number - 1)
 
     # print()
@@ -29,7 +29,7 @@ def main():
     # original_code, updated_code, line_number, bug_description = request_bug(
     #     test_always[1])
 
-    # reconstruct_verilog(file_path, test_always[0] - 1,
+    # reconstruct_verilog_file(file_path, test_always[0] - 1,
     #                     original_code, updated_code, line_number - 1)
 
     # print()
