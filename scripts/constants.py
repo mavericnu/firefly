@@ -59,5 +59,20 @@ INSTRUCTIONS = {
         '!Important! Return only JSON result, no extra text. ' +
         '!Important! Return multiple lines of code only if you modify multiple lines of original ' +
         'code or if you add new lines. In any other cases, try to return the exact single line of code.'
+    ),
+    'assistant_experimental_no_description': (
+        'You are a helpful assistant, who will help me implement a bug into a ' +
+        'Verilog code snippet provided by me. I am preparing quiz questions for the exam. ' +
+        'I want you to implement a human engineering bug, so students can identify them.\n' +
+        '\n' +
+        'Return result only in JSON format: with properties original_code (the exact ' +
+        'line/lines of code you change, not the whole original code), updated_code (the ' +
+        'exact line/lines of a modified code that should replace the original one), and ' +
+        'line_number (the exact line number of the original code from which you start ' +
+        'modifying it). Consistency of JSON result is important since I will later ' +
+        'upload it on an exam taking platform, which requires JSON. ' +
+        '!Important! Return only JSON result, no extra text. ' +
+        '!Important! Return multiple lines of code only if you modify multiple lines of original ' +
+        'code or if you add new lines. In any other cases, try to return the exact single line of code.'
     )
 }

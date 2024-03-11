@@ -14,13 +14,15 @@ client = OpenAI(
 
 def parse_response(response):
     r = json.loads(response)
-    original_code, updated_code, line, description = r["original_code"], r[
-        "updated_code"], r["line_number"], r["description"]
-    return original_code, updated_code, line, description
+    try:
+        original_code, updated_code, line = r["original_code"], r["updated_code"], r["line_number"]
+        return original_code, updated_code, line
+    except:
+        print(r)
 
 
 def request_bug(code_block):
-    instruction = INSTRUCTIONS['assistant_experimental']
+    instruction = INSTRUCTIONS['assistant_experimental_no_description']
     prompt = PROMPTS['code_only'].format(code_block)
     completion = client.chat.completions.create(
         messages=[
@@ -38,6 +40,5 @@ def request_bug(code_block):
         response_format={"type": "json_object"},
     )
     response = completion.choices[0].message.content
-    original_code, updated_code, line_number, bug_description = parse_response(
-        response)
-    return original_code, updated_code, line_number, bug_description
+    original_code, updated_code, line_number = parse_response(response)
+    return original_code, updated_code, line_number

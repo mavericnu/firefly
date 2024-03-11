@@ -1,26 +1,18 @@
 # Copyright (c) 2024 Maveric @ NU and Texer.ai.
 # All rights reserved.
 
-# TODOs:
-# 1. Handle large files. (?)
-
-# NOTEs:
-# 1. LLM might response with a syntactically incorrect original code
-# (e.g., did not include one of the brackets) => script cannot find/replace the original code.
-
 import sys
-
 from prompt_chatgpt import request_bug
 from breakdown_verilog import parse_verilog
-from utils import reconstruct_verilog, replace_file
-
-file_path = sys.argv[1]
+from utils import *
 
 
 def main():
-    assign_statements, always_blocks = parse_verilog([file_path])
+    # file_path = sys.argv[1]
 
-    i = 1
+    # assign_statements, always_blocks = parse_verilog(file_path)
+
+    # i = 1
 
     # test_assign = list(assign_statements.items())[i]
     # original_code, updated_code, line_number, bug_description = request_bug(
@@ -33,26 +25,30 @@ def main():
     # print(
     #     f"[ Check from line {list(assign_statements.keys())[i]} and further ]\n")
 
-    test_always = list(always_blocks.items())[i]
-    original_code, updated_code, line_number, bug_description = request_bug(
-        test_always[1])
+    # test_always = list(always_blocks.items())[i]
+    # original_code, updated_code, line_number, bug_description = request_bug(
+    #     test_always[1])
 
-    reconstruct_verilog(file_path, test_always[0] - 1,
-                        original_code, updated_code, line_number - 1)
+    # reconstruct_verilog(file_path, test_always[0] - 1,
+    #                     original_code, updated_code, line_number - 1)
 
-    print()
-    print(f"[ Check from line {list(always_blocks.keys())[i]} and further ]\n")
+    # print()
+    # print(f"[ Check from line {list(always_blocks.keys())[i]} and further ]\n")
 
-    print("ORIGINAL CODE:")
-    print(original_code)
-    print()
-    print("UPDATED CODE:")
-    print(updated_code)
-    print()
-    print("BUG DESCRIPTION:")
-    print(bug_description)
+    # print("ORIGINAL CODE:")
+    # print(original_code)
+    # print()
+    # print("UPDATED CODE:")
+    # print(updated_code)
+    # print()
+    # print("BUG DESCRIPTION:")
+    # print(bug_description)
 
-    replace_file(file_path)
+    # replace_file(file_path)
+
+    directory_path = "/home/maveric/workspace/cva6/core"
+    verilog_buffer = parse_dir(directory_path)
+    export_to_json(verilog_buffer)
 
 
 main()
