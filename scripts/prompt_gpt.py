@@ -20,14 +20,13 @@ def parse_response(response):
         r = json.loads(response)
         original_code = r["original_code"]
         updated_code = r["updated_code"]
-        line = r["line_number"]
-        return original_code, updated_code, line
+        return original_code, updated_code
     except KeyError as e:
         print(f"KeyError: missing {e} in response")
-        return None, None, None
+        return None, None
     except json.JSONDecodeError as e:
         print(f"JSONDecodeError: {e}")
-        return None, None, None
+        return None, None
 
 
 def request_bug(code_block):
@@ -40,10 +39,10 @@ def request_bug(code_block):
                 {"role": "user", "content": prompt}
             ],
             model="gpt-4-1106-preview",
-            response_format="json",
+            response_format={"type": "json_object"},
         )
         response = completion.choices[0].message.content
         return parse_response(response)
     except Exception as e:
         print(f"Error during OpenAI API call: {e}")
-        return None, None, None
+        return None, None
