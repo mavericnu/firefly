@@ -49,34 +49,36 @@ INSTRUCTIONS = {
         """,
     'assistant_experimental':
         """
-        You are a helpful assistant, who will help me implement a bug into a 
-        Verilog code snippet provided by me. I am preparing quiz questions for the exam. 
-        I want you to implement a human engineering bug, so students can identify them.\n
-        \n
-        Return result only in JSON format: with properties original_code (the exact 
-        line/lines of code you change, not the whole original code), updated_code (the 
-        exact line/lines of a modified code that should replace the original one), line_number 
-        (the exact line number of the original code from which you start modifying it) and 
-        description (extensive bug description). Consistency of JSON result is important 
-        since I will later upload it on an exam taking platform, which requires JSON. 
+        You are a helpful assistant, who will help me implement a bug into a Verilog code snippet provided by me. 
+        I am preparing quiz questions for the exam. I want you to implement a human engineering bug, so students 
+        can identify them. 
+        
+        Return result only in JSON format: with properties original_code (the exact line/lines of code you change, 
+        not the whole original code), updated_code (the exact line/lines of a modified code that should replace the 
+        original one), line_number (the exact line number of the original code from which you start modifying it) 
+        and description (extensive bug description). Consistency of JSON result is important since I will later 
+        upload it on an exam taking platform, which requires JSON. 
+        
         !Important! Return only JSON result, no extra text. 
-        !Important! Return multiple lines of code only if you modify multiple lines of original 
-        code or if you add new lines. In any other cases, try to return the exact single line of code.
+        !Important! Return multiple lines of code only if you modify multiple lines of original code or if you add 
+        new lines. In any other cases, try to return the exact single line of code.
         """,
     'assistant_experimental_no_description':
         """
-        You are a helpful assistant, who will help me implement a bug into a 
-        Verilog code snippet provided by me. I am preparing quiz questions for the exam. 
-        I want you to implement a human engineering bug, so students can identify them.\n
-        \n
-        Return result only in JSON format: with properties original_code (the exact 
-        line/lines of code you change, not the whole original code), updated_code (the 
-        exact line/lines of a modified code that should replace the original one), and 
-        line_number (the exact line number of the original code from which you start 
-        modifying it). Consistency of JSON result is important since I will later 
-        upload it on an exam taking platform, which requires JSON. 
-        !Important! Return only JSON result, no extra text. 
-        !Important! Return multiple lines of code only if you modify multiple lines of original 
-        code or if you add new lines. In any other cases, try to return the exact single line of code.
+        You are a helpful assistant tasked with implementing a specific type of bug into a Verilog code snippet provided by me. 
+        These modifications are for creating quiz questions aimed at testing students' ability to identify and understand common 
+        pitfalls in Verilog coding. 
+
+        Please introduce a bug that falls into one of the following categories: logical errors, subtle syntax issues that still 
+        allow compilation, or race conditions. 
+
+        Return the result exclusively in JSON format, containing two properties: `original_code` and `updated_code`. 
+        `original_code` should include the exact line(s) of code you modify, sufficient to uniquely identify it in a file. 
+        `updated_code` should contain the modified code line(s) meant to replace the original. Ensure these modifications 
+        are consistent and easily searchable within a code file for replacement purposes. 
+
+        !Important! Only return the JSON result, without extra explanatory text. 
+        !Important! Include multiple lines of code in the response only if the modification spans multiple lines or introduces 
+        new lines. In other scenarios, limit the response to the exact single line of code modified.
         """
 }

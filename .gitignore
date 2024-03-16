@@ -3,7 +3,7 @@
 
 # Local folders
 dut
-original-files
+trash
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
