@@ -11,32 +11,39 @@ def extract_assign_and_always_blocks(lines):
     assign_statements = {}
     always_blocks = {}
     inside_always = False
+    inside_block_comment = False
     nesting_level = 0
     current_always_block = []
+    always_start = None
 
     for line_number, line in enumerate(lines, start=1):
-        # Check for assign statements.
-        if line.strip().startswith('assign'):
-            assign_statements[line_number] = line.strip()
+        if '/*' in line:
+            inside_block_comment = True
+        if '*/' in line:
+            inside_block_comment = False
             continue
 
-        # Check for start of always block.
-        if 'always' in line:
+        if inside_block_comment or line.strip().startswith('//'):
+            continue
+
+        stripped_line = line.strip()
+
+        if stripped_line.startswith('assign') and not inside_block_comment:
+            assign_statements[line_number] = stripped_line
+            continue
+
+        if 'always' in stripped_line and not inside_block_comment:
             inside_always = True
-            current_always_block.append(line.strip())
             always_start = line_number
-            continue
 
-        # If inside always block, process the line.
         if inside_always:
-            current_always_block.append(line.strip())
-            if 'begin' in line:
+            current_always_block.append(stripped_line)
+            if 'begin' in stripped_line:
                 nesting_level += 1
-            if 'end' in line:
+            elif 'end' in stripped_line:
                 if nesting_level > 0:
                     nesting_level -= 1
                 else:
-                    # End of always block.
                     inside_always = False
                     always_blocks[always_start] = '\n'.join(
                         current_always_block)
@@ -59,36 +66,22 @@ def print_assign_and_always_blocks(assign_statements, always_blocks):
 
 def parse_verilog_file(file_path):
     lines = read_verilog_file(file_path)
-    assign_statements, always_blocks = extract_assign_and_always_blocks(
-        lines)
-
-    # print_assign_and_always_blocks(assign_statements, always_blocks)
-    return assign_statements, always_blocks
+    return extract_assign_and_always_blocks(lines)
 
 
-def reconstruct_verilog_file(file_path, init_index, original_code, updated_code, upd_index):
-    file_name = file_path.split('/')[-1]
-    f = open(file_name, 'w')
+def reconstruct_verilog_file(file_path, original_code, updated_code):
     try:
         with open(file_path, 'r') as file:
-            lines = file.readlines
-        index = init_index + upd_index
-        if lines[index].find(original_code) == -1:
-            print(
-                "[ Replacement using lines is unsuccessful. Trying another method... ]")
-            # print("Looked for: ", original_code)
-            # print("Found: ", lines[index])
-            raise Exception('')
-        lines[index] = lines[index].replace(original_code, updated_code)
-        f.writelines(lines)
-    except:
-        with open(file_path, 'r') as file:
             file_content = file.read()
-        if file_content.find(original_code) == -1:
-            print("[ Replacement using the whole file is also unsuccessful ]")
-            f.close()
-            return
-        file_content = file_content.replace(original_code, updated_code, 1)
-        f.write(file_content)
-    f.close()
-    print("[ SUCCESS ]")
+
+        if original_code in file_content:
+            updated_file_content = file_content.replace(original_code, updated_code)
+
+            with open(file_path, 'w') as file:
+                file.write(updated_file_content)
+
+            print("Replacement within a file is successful.")
+        else:
+            print("Error: Original code not found in the file.")
+    except Exception as e:
+        print(f"Error: An exception occurred. {e}")
