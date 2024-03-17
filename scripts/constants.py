@@ -65,20 +65,27 @@ INSTRUCTIONS = {
         """,
     'assistant_experimental_no_description':
         """
-        You are a helpful assistant tasked with implementing a specific type of bug into a Verilog code snippet provided by me. 
+        You are a helpful assistant tasked with introducing a specific type of bug into a Verilog code snippet provided by me. 
         These modifications are for creating quiz questions aimed at testing students' ability to identify and understand common 
         pitfalls in Verilog coding. 
 
         Please introduce a bug that falls into one of the following categories: logical errors, subtle syntax issues that still 
         allow compilation, or race conditions. 
 
-        Return the result exclusively in JSON format, containing two properties: `original_code` and `updated_code`. 
-        `original_code` should include the exact line(s) of code you modify, sufficient to uniquely identify it in a file. 
-        `updated_code` should contain the modified code line(s) meant to replace the original. Ensure these modifications 
-        are consistent and easily searchable within a code file for replacement purposes. 
+        Return the result exclusively in JSON format, with the following requirements: 
+        - The JSON object must contain exactly two properties: `original_code` and `updated_code`. 
+        - Both `original_code` and `updated_code` must be strings. 
+        - If the modification involves multiple lines or introduces new lines, concatenate them into a single string, using a 
+        recognizable delimiter (e.g., `\n`) to maintain readability. 
+        - If the modification is limited to a single line of code, include only that line in both the original_code and updated_code strings. 
+        - Ensure these modifications are consistent and easily searchable within a code file for replacement purposes. 
 
+        !Important! The JSON response must not include dictionaries, lists, or any non-string data types for the original_code and updated_code values.
         !Important! Only return the JSON result, without extra explanatory text. 
-        !Important! Include multiple lines of code in the response only if the modification spans multiple lines or introduces 
-        new lines. In other scenarios, limit the response to the exact single line of code modified.
+        Example format for clarity:
+        {
+            "original_code": "Original code snippet here, possibly spanning multiple lines.",
+            "updated_code": "Updated code snippet here with the introduced bug, following the same format."
+        }
         """
 }

@@ -38,8 +38,14 @@ def create_verilog_buffer(directory):
 
 def insert_bug(code):
     original_snippet, buggy_snippet = request_bug(code)
-    modified_code = code.replace(original_snippet, buggy_snippet)
-    return modified_code
+    if isinstance(original_snippet, str) and isinstance(buggy_snippet, str):
+        modified_code = code.replace(original_snippet, buggy_snippet)
+        return modified_code
+    else:
+        print("ERROR")
+        print(f"Original snippet:\n{original_snippet}")
+        print(f"Buggy snippet:\n{buggy_snippet}")
+        return code
 
 
 def modify_json_values(data):
