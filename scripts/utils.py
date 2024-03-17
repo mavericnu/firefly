@@ -6,6 +6,7 @@ import json
 import subprocess
 import multiprocessing
 from verilog_operations import parse_verilog_file
+from prompt_gpt import request_bug
 
 
 def replace_file(file_path):
@@ -31,5 +32,30 @@ def parse_dir(directory):
 
 def create_verilog_buffer(directory):
     verilog_buffer = parse_dir(directory)
-    with open("buffer.json", "w") as outfile:
+    with open("../buffers/buffer.json", "w") as outfile:
         json.dump(verilog_buffer, outfile)
+
+
+def insert_bug(code):
+    original_snippet, buggy_snippet = request_bug(code)
+    modified_code = code.replace(original_snippet, buggy_snippet)
+    return modified_code
+
+
+def modify_json_values(data):
+    if isinstance(data, dict):
+        return {k: modify_json_values(v) for k, v in data.items()}
+    elif isinstance(data, list):
+        return [modify_json_values(v) for v in data]
+    elif isinstance(data, str):
+        return insert_bug(data)
+    else:
+        return data
+
+
+def create_buggy_buffer(input_filename):
+    with open(input_filename, 'r') as infile:
+        data = json.load(infile)
+    modified_data = modify_json_values(data)
+    with open("../buffers/bugs.json", 'w') as outfile:
+        json.dump(modified_data, outfile, indent=4)

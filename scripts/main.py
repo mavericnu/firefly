@@ -10,6 +10,7 @@ from utils import *
 def main():
     directory_path = "/home/maveric/workspace/copies/cva6/"
     create_verilog_buffer(directory_path)
+    create_buggy_buffer("../buffers/buffer.json")
 
 
 main()
