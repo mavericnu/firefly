@@ -21,33 +21,43 @@ def extract_assign_and_always_blocks(lines):
             inside_block_comment = True
         if '*/' in line:
             inside_block_comment = False
+            if inside_always:
+                current_always_block.append(line)
             continue
 
-        if inside_block_comment or line.strip().startswith('//'):
+        if inside_block_comment:
+            if inside_always:
+                current_always_block.append(line)
             continue
 
-        stripped_line = line.strip()
-
-        if stripped_line.startswith('assign') and not inside_block_comment:
-            assign_statements[line_number] = stripped_line
+        line_stripped = line.strip()
+        if line_stripped.startswith('//'):
+            if inside_always:
+                current_always_block.append(line)
             continue
 
-        if 'always' in stripped_line and not inside_block_comment:
-            inside_always = True
-            always_start = line_number
+        if line_stripped.startswith('assign'):
+            assign_statements[line_number] = line.rstrip()
+            continue
 
-        if inside_always:
-            current_always_block.append(stripped_line)
-            if 'begin' in stripped_line:
-                nesting_level += 1
-            elif 'end' in stripped_line:
-                if nesting_level > 0:
+        if 'always' in line_stripped or inside_always:
+            if 'always' in line_stripped:
+                inside_always = True
+                always_start = line_number
+                current_always_block = [line.rstrip()]
+            elif inside_always:
+                current_always_block.append(line.rstrip())
+                if '{' in line or 'begin' in line_stripped:
+                    nesting_level += 1
+                if '}' in line or 'end' in line_stripped:
                     nesting_level -= 1
-                else:
-                    inside_always = False
-                    always_blocks[always_start] = '\n'.join(
-                        current_always_block)
-                    current_always_block = []
+                    if nesting_level <= 0:
+                        inside_always = False
+                        always_blocks[always_start] = '\n'.join(current_always_block)
+                        current_always_block = []
+                        nesting_level = 0
+        elif not inside_always:
+            pass
 
     return assign_statements, always_blocks
 
