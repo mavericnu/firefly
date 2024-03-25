@@ -62,6 +62,11 @@ def extract_assign_and_always_blocks(lines):
     return assign_statements, always_blocks
 
 
+def parse_verilog_file(file_path):
+    lines = read_verilog_file(file_path)
+    return extract_assign_and_always_blocks(lines)
+
+
 def print_assign_and_always_blocks(assign_statements, always_blocks):
     print("Assigns:")
     print("-----------------------------")
@@ -72,11 +77,6 @@ def print_assign_and_always_blocks(assign_statements, always_blocks):
     print("-----------------------------")
     for block in always_blocks:
         print(block)
-
-
-def parse_verilog_file(file_path):
-    lines = read_verilog_file(file_path)
-    return extract_assign_and_always_blocks(lines)
 
 
 def reconstruct_verilog_file(file_path, original_code, updated_code):
