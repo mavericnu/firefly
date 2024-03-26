@@ -4,7 +4,6 @@
 # Local folders
 dut
 buffers
-buffers_test
 trash
 
 # Byte-compiled / optimized / DLL files

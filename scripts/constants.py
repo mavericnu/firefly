@@ -89,3 +89,17 @@ INSTRUCTIONS = {
         }
         """
 }
+
+CVA6_SOURCE_FILES = [
+    "riscv_pkg.sv", "dm_pkg.sv", "ariane_pkg.sv", "std_cache_pkg.sv", "alu.sv",
+    "ariane.sv", "branch_unit.sv", "cache_ctrl.sv", "commit_stage.sv", "compressed_decoder.sv",
+    "controller.sv", "csr_buffer.sv", "csr_regfile.sv", "decoder.sv", "ex_stage.sv", "btb.sv",
+    "bht.sv", "ras.sv", "instr_scan.sv", "frontend.sv", "id_stage.sv", "scoreboard.sv",
+    "store_buffer.sv", "store_unit.sv", "tlb.sv", "cva6_tlb_sv32.sv", "acc_dispatcher.sv",
+    "dm_csrs.sv", "dm_mem.sv", "dm_top.sv", "dmi_cdc.sv", "dmi_jtag.sv", "dmi_jtag_tap.sv",
+    "apb_timer.sv", "timer.sv", "issue_read_operands.sv", "issue_stage.sv", "lfsr.sv",
+    "load_unit.sv", "load_store_unit.sv", "miss_handler.sv", "mmu.sv", "cva6_mmu_sv32.sv",
+    "mult.sv", "std_cache_subsystem.sv", "perf_counters.sv", "ptw.sv", "cva6_ptw_sv32.sv",
+    "instruction_tracer_if.sv", "instruction_tracer_pkg.sv", "instr_realigner.sv", "vdregs.sv",
+    "pcgen_stage.sv", "re_name.sv", "icache.sv", "nbdcache.sv", "sram_wrapper.sv"
+]
