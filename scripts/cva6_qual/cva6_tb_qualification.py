@@ -62,8 +62,8 @@ def filter(tuples):
 
 
 def cva6_add_bug(tpl):
-    root_copy = "/home/maveric/workspace/copies/cva6/"
-    dest_path = "/home/maveric/workspace/copies/"
+    root_copy = "/home/maveric/cva6_env/copies/cva6/"
+    dest_path = "/home/maveric/cva6_env/copies/"
 
     path, original, modified = tpl
     start = path.find("cva6/") + 5

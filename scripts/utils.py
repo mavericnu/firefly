@@ -32,7 +32,7 @@ def parse_dir(directory):
 
 def create_verilog_buffer(directory):
     verilog_buffer = parse_dir(directory)
-    with open("../buffers/buffer.json", "w") as outfile:
+    with open("../bp_buffers/bp_common/buffer.json", "w") as outfile:
         json.dump(verilog_buffer, outfile)
 
 
@@ -43,8 +43,8 @@ def insert_bug(code):
         return modified_code
     else:
         print("ERROR")
-        print(f"Original snippet:\n{original_snippet}")
-        print(f"Buggy snippet:\n{buggy_snippet}")
+        # print(f"Original snippet:\n{original_snippet}")
+        # print(f"Buggy snippet:\n{buggy_snippet}")
         return code
 
 
@@ -63,5 +63,5 @@ def create_buggy_buffer(input_filename):
     with open(input_filename, 'r') as infile:
         data = json.load(infile)
     modified_data = modify_json_values(data)
-    with open("../buffers/bugs.json", 'w') as outfile:
+    with open("../bp_buffers/bp_me/bugs.json", 'w') as outfile:
         json.dump(modified_data, outfile, indent=4)

@@ -1,7 +1,7 @@
 import os
 
 file = "detected.txt"
-logs = "/home/maveric/workspace/copies/logs/results_all"
+logs = "/home/maveric/cva6_env/logs/results_all"
 
 with open(file, "r") as infile:
     content = infile.readlines()
@@ -60,6 +60,8 @@ detected_2, veri_errors_2 = set(detected_2), set(veri_errors_2)
 
 detected = detected_1.union(detected_2)
 veri_errors = veri_errors_1.intersection(veri_errors_2)
+
+print(detected)
 
 
 print("Truly detected:", len(detected))
