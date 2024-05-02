@@ -3,16 +3,10 @@
 
 import os
 import json
-import subprocess
-import multiprocessing
+from concurrent.futures import ProcessPoolExecutor, as_completed
+
 from verilog_operations import parse_verilog_file
 from prompt_gpt import request_bug
-
-
-def replace_file(file_path):
-    directory, filename = os.path.split(file_path)
-    subprocess.run(['mv', file_path, '../original-files/'])
-    subprocess.run(['mv', filename, directory])
 
 
 def parse_dir(directory):
@@ -65,3 +59,41 @@ def create_buggy_buffer(input_filename):
     modified_data = modify_json_values(data)
     with open("../bp_buffers/bp_me/bugs.json", 'w') as outfile:
         json.dump(modified_data, outfile, indent=4)
+
+
+def load_json_from_file(filepath):
+    with open(filepath, "r") as file:
+        return json.load(file)
+
+
+def compare_json_leaves(path, json1, json2):
+    if isinstance(json1, dict) and isinstance(json2, dict):
+        keys1, keys2 = set(json1.keys()), set(json2.keys())
+        common_keys = keys1 & keys2
+
+        for key in common_keys:
+            yield from compare_json_leaves(os.path.join(path, key), json1[key], json2[key])
+        for key in keys1 - keys2:
+            yield (os.path.join(path, key), json1[key], None)
+        for key in keys2 - keys1:
+            yield (os.path.join(path, key), None, json2[key])
+    else:
+        yield (path, json1, json2)
+
+
+def get_code_blocks(json1, json2):
+    return list(compare_json_leaves("", json1, json2))
+
+
+def complete_task_in_parallel(func, code_blocks, max_workers=4):
+    with ProcessPoolExecutor(max_workers=max_workers) as executor:
+        future_to_code_block = {
+            executor.submit(func, code_block): code_block for code_block in code_blocks
+        }
+
+        for future in as_completed(future_to_code_block):
+            code_block = future_to_code_block[future]
+            try:
+                future.result()
+            except Exception as exc:
+                print("%r generated an exception: %s" % (code_block, exc))

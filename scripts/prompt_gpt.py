@@ -2,7 +2,6 @@
 # All rights reserved.
 
 import os
-import re
 import json
 from openai import OpenAI
 from constants import PROMPTS, INSTRUCTIONS

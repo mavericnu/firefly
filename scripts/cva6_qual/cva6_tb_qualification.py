@@ -1,13 +1,23 @@
-from concurrent.futures import ProcessPoolExecutor, as_completed
 import os
 import sys
 import subprocess
-import json
 from uuid import uuid4
 
-import random
+from utils import load_json_from_file, get_code_blocks, complete_task_in_parallel
 
-from constants import CVA6_SOURCE_FILES
+CVA6_SOURCE_FILES = [
+    "riscv_pkg.sv", "dm_pkg.sv", "ariane_pkg.sv", "std_cache_pkg.sv", "alu.sv",
+    "ariane.sv", "branch_unit.sv", "cache_ctrl.sv", "commit_stage.sv", "compressed_decoder.sv",
+    "controller.sv", "csr_buffer.sv", "csr_regfile.sv", "decoder.sv", "ex_stage.sv", "btb.sv",
+    "bht.sv", "ras.sv", "instr_scan.sv", "frontend.sv", "id_stage.sv", "scoreboard.sv",
+    "store_buffer.sv", "store_unit.sv", "tlb.sv", "cva6_tlb_sv32.sv", "acc_dispatcher.sv",
+    "dm_csrs.sv", "dm_mem.sv", "dm_top.sv", "dmi_cdc.sv", "dmi_jtag.sv", "dmi_jtag_tap.sv",
+    "apb_timer.sv", "timer.sv", "issue_read_operands.sv", "issue_stage.sv", "lfsr.sv",
+    "load_unit.sv", "load_store_unit.sv", "miss_handler.sv", "mmu.sv", "cva6_mmu_sv32.sv",
+    "mult.sv", "std_cache_subsystem.sv", "perf_counters.sv", "ptw.sv", "cva6_ptw_sv32.sv",
+    "instruction_tracer_if.sv", "instruction_tracer_pkg.sv", "instr_realigner.sv", "vdregs.sv",
+    "pcgen_stage.sv", "re_name.sv", "icache.sv", "nbdcache.sv", "sram_wrapper.sv"
+]
 
 
 def cva6_copy_dir(source, destination):
@@ -22,31 +32,7 @@ def cva6_copy_dir(source, destination):
     return dir_id, target_dir
 
 
-def load_json_from_file(filepath):
-    with open(filepath, "r") as file:
-        return json.load(file)
-
-
-def compare_json_leaves(path, json1, json2):
-    if isinstance(json1, dict) and isinstance(json2, dict):
-        keys1, keys2 = set(json1.keys()), set(json2.keys())
-        common_keys = keys1 & keys2
-
-        for key in common_keys:
-            yield from compare_json_leaves(os.path.join(path, key), json1[key], json2[key])
-        for key in keys1 - keys2:
-            yield (os.path.join(path, key), json1[key], None)
-        for key in keys2 - keys1:
-            yield (os.path.join(path, key), None, json2[key])
-    else:
-        yield (path, json1, json2)
-
-
-def get_code_blocks(json1, json2):
-    return list(compare_json_leaves("", json1, json2))
-
-
-def filter(tuples):
+def cva6_filter(tuples):
     base_filter_result = [
         tpl for tpl in tuples
         if tpl[2] != None and "cva6/tools" not in tpl[0]
@@ -93,7 +79,7 @@ def cva6_qualification(code_block):
     dir_id, trgt, tmp = cva6_add_bug(code_block)
     script = tmp + "/run_tests.sh"
 
-    result = subprocess.run(f"source {script}", shell=True,
+    subprocess.run(f"source {script}", shell=True,
                             executable="/bin/bash", cwd=tmp)
 
     file = tmp + "/output.txt"
@@ -120,27 +106,13 @@ def cva6_qualification(code_block):
     subprocess.run(f"cd ../../ && rm -rf {dir_id}", shell=True, executable="/bin/bash", cwd=tmp)
 
 
-def complete_task_in_parallel(code_blocks, max_workers=4):
-    with ProcessPoolExecutor(max_workers=max_workers) as executor:
-        future_to_code_block = {
-            executor.submit(cva6_qualification, code_block): code_block for code_block in code_blocks
-        }
-
-        for future in as_completed(future_to_code_block):
-            code_block = future_to_code_block[future]
-            try:
-                future.result()
-            except Exception as exc:
-                print("%r generated an exception: %s" % (code_block, exc))
-
-
 def main():
     json_data1 = load_json_from_file("/home/maveric/workspace/firefly/buffers/buffer.json")
     json_data2 = load_json_from_file("/home/maveric/workspace/firefly/buffers/bugs.json")
 
-    code_blocks = sorted(filter(get_code_blocks(json_data1, json_data2)), key=lambda x: x[0])
+    code_blocks = sorted(cva6_filter(get_code_blocks(json_data1, json_data2)), key=lambda x: x[0])
 
-    complete_task_in_parallel(code_blocks[400:])
+    complete_task_in_parallel(func=cva6_qualification, code_blocks=code_blocks)
 
 
 if __name__ == "__main__":
