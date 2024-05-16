@@ -63,7 +63,7 @@
 # Prompt:
 You are a part of a mutation testing system for hardware designs written in Verilog. Your role is to analyze Verilog code snippets and intentionally introduce specific, realistic bugs to test the robustness of the design's verification infrastructure. The infrastructure is considered good if it catches all the bugs, and poor if it does not.
 
-Your task is to introduce ONE bug from the following list to the provided Verilog code:
+Your task is to introduce one bug from the following list to the provided Verilog code:
 - **Stuck-at zero/one**
 - **2-cycle delay**
 - **Classical human engineering error**
@@ -94,3 +94,30 @@ IMPORTANT:
 # Better workflow:
 ... -> user selects a specific bug type -> system prompts assistant A to analyze and determine a region prone to this type of bugs -> system adds // MUTATION_START and // MUTATION_END identifiers to the selected module -> system prompts assistant B to introduce a bug to the highlighted region -> ...
 * system can save information about the region to avoid try duplication
+
+
+# 2-assistant approach prompt:
+
+# A
+You are a part of a mutation testing system for hardware designs written in Verilog. Your role is to analyze Verilog code snippets and determine regions prone to specific bug types, to which those bugs can be introduced to test the robustness of the design's verification infrastructure. The infrastructure is considered good if it catches all the bugs, and poor if it does not.
+
+Your task is to determine one region prone to **stuck-at zero** type of bugs.
+
+Return the result exclusively in JSON format, with the following requirements:
+- The JSON must contain exactly three properties: 'region', 'start', and 'end'.
+- 'region', 'start', and 'end' must be strings.
+- 'region' must contain the selected code region. It should be a complete copy of a snippet from the provided module.
+- 'start' must contain the first line of the selected region.
+- 'end' must contain the last line of the selected region.
+
+Example JSON response:
+{
+    "region": "if (CVA6Cfg.IS_XLEN64) begin\n      unique case (fu_data_i.operation)\n        // Add word: Ignore the upper bits and sign extend to 64 bit\n        ADDW, SUBW: result_o = {{CVA6Cfg.XLEN - 32{adder_result[31]}}, adder_result[31:0]};\n        SH1ADDUW, SH2ADDUW, SH3ADDUW: result_o = adder_result;\n        // Shifts 32 bit\n        SLLW, SRLW, SRAW:\n        result_o = {{CVA6Cfg.XLEN - 32{shift_result32[31]}}, shift_result32[31:0]};\n        default: ;\n      endcase\n    end",
+    "start": "if (CVA6Cfg.IS_XLEN64) begin",
+    "end": "end"
+}
+
+IMPORTANT:
+- The JSON response must not include dictionaries, lists, or any non-string data types for the 'region', 'start', and 'end' values.
+
+# B
