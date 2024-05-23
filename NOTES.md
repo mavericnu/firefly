@@ -72,7 +72,7 @@
 # Prompt:
 You are a part of a mutation testing system for hardware designs written in Verilog. Your role is to analyze Verilog code snippets and intentionally introduce specific, realistic bugs to test the robustness of the design's verification infrastructure. The infrastructure is considered good if it catches all the bugs, and poor if it does not.
 
-Your task is to introduce one bug of the following type to the provided Verilog code: {} **stuck-at-0**.
+Your task is to rewrite the provided Verilog code with a requested bug type.
 
 When introducing the bug:
 - **Prioritize correct Verilog syntax and semantics.** The bug should be subtle and realistic.
@@ -82,17 +82,29 @@ Return the result exclusively in JSON format, with the following requirements:
 - The JSON must contain exactly two properties: 'description' and 'code'.
 - 'description' and 'code' must be strings.
 - 'description' must contain your step-by-step thought process for introducing each bug.
-- 'code' must contain the updated buggy code. It must be consistent with the module context.
+- 'code' must contain the updated buggy code. It must be consistent with the module context. There is no need to add comments.
 
 Example JSON response:
+```json
 {
     "description": "To introduce a stuck-at zero fault in the provided ALU module, I will choose a line of code that has a significant effect on the calculation or functionality and modify it so that a particular part of the calculation or operation is permanently stuck at zero. Specifically, I will affect the shift operations, as these are common in various ALU functionalities and can significantly alter the behavior if compromised. I will change the logic which decides the shift_arithmetic signal, which controls arithmetic right shifts. Setting this signal to always zero will disable the arithmetic nature of right shifts, potentially causing logical bugs in operations that rely on sign preservation in shifts.",
     "code": "shift_arithmetic = 1'b0;"
 }
+```
 
 IMPORTANT:
 - The JSON response must not include dictionaries, lists, or any non-string data types for the 'description' and 'code' values.
-- The code must remain synthesizable after the addition of a bug.
+- The code must remain synthesizable after the addition of a bug. It must exactly replicate the originally provided Verilog code except being buggy.
+
+Hardware module for context:
+```Verilog
+{}
+```
+
+# Intermediate example responses
+// Register all interrupt inputs (on gated clock). The wake-up logic will\n // observe irq_i as well, but in all other places irq_q will be used to \n // avoid timing paths from irq_i to instr_*_o\n\n always_ff @(posedge clk, negedge rst_n)\n begin\n if (rst_n == 1'b0) begin\n irq_q <= '0;\n irq_sec_q <= 1'b0;\n end else begin\n irq_q <= 32'b0; // Stuck-at-0 fault introduced here\n irq_sec_q <= irq_sec_i;\n end\n end\n\n // MIP CSR\n assign mip_o = irq_q;\n\n // Qualify registered IRQ with MIE CSR to compute locally enabled IRQs\n assign irq_local_qual = irq_q & mie_bypass_i;\n\n // Wake-up signal based on unregistered IRQ such that wake-up can be caused if no clock is present\n assign irq_wu_ctrl_o = |(irq_i & mie_bypass_i);
+
+// Wake-up signal based on unregistered IRQ such that wake-up can be caused if no clock is present\n assign irq_wu_ctrl_o = |(irq_i && mie_bypass_i); // Classical human engineering error: incorrect use of logical AND '&&' instead of bitwise AND '&'
 
 
 # TODO:
