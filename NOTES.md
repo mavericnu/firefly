@@ -1,8 +1,3 @@
-# For the approach with unique identifiers, 2 assistants are required:
-    for parsing/analyzing module + identifying code snippets prone to bugs
-    for introducing a bug to the previously identified place
-
-
 # Potential workflow
     1. system outputs a list of modules
     2. user selects a module to modify
@@ -16,15 +11,35 @@
         2. system inserts a bug
         3. system runs a test suite 
 
+# Questionably better workflow:
+... -> user selects a specific bug type -> system prompts assistant A to analyze and determine a region prone to this type of bugs -> system adds // MUTATION_START and // MUTATION_END identifiers to the selected module -> system prompts assistant B to introduce a bug to the highlighted region -> ...
+* system can save information about the region to avoid try duplication
 
-# Bug types
+
+# Firefly bug types
     stuck-at zero
     2-cycle delay
     classical human engineering error
     connectivity fault
 
+## Certitude fault types:
+    Output Port Faults:
+        OutputPortStuckAt0 - forces the output port to 0
+        OutputPortStuckAt1 - forces the output port to 1
+        OutputPortNegated - inverts the value of the output port
+    Condition Faults:
+        ConditionFalse - replaces a conditional line with a statement that is always false
+        ConditionTrue - replaces a conditional line with a statement that is always true
+        NegatedCondition - negates the condition in a conditional statement
+    Reset Condition Faults:
+        ResetConditionTrue - modifies reset-related signals to their initialization values
+    Internal Connectivity Faults:
+        InputPortConnectionStuckAt0 - forces an input port to 0
+        InputPortConnectionStuckAt1 - forces an input port to 1
+        InputPortConnectionNegated - inverts the value of the input port
 
-# Issue related to approach #2:
+
+# Issue related to the line-numbers-approach:
     initial:
         105 assign adder_in_a = {operand_a_bitmanip, 1'b1};
         110 assign adder_result = adder_result_ext_o[CVA6Cfg.XLEN:1];
@@ -54,20 +69,10 @@
         120 assign adder_result = adder_result_d2;
 
 
-# Answer these questions:
-    how does code interpreter work?
-    do code interpreter & file search improve output?
-        * file search cannot access .sv files
-
-
 # Prompt:
 You are a part of a mutation testing system for hardware designs written in Verilog. Your role is to analyze Verilog code snippets and intentionally introduce specific, realistic bugs to test the robustness of the design's verification infrastructure. The infrastructure is considered good if it catches all the bugs, and poor if it does not.
 
-Your task is to introduce one bug from the following list to the provided Verilog code:
-- **Stuck-at zero/one**
-- **2-cycle delay**
-- **Classical human engineering error**
-- **Connectivity fault**
+Your task is to introduce one bug of the following type to the provided Verilog code: {} **stuck-at-0**.
 
 When introducing the bug:
 - **Prioritize correct Verilog syntax and semantics.** The bug should be subtle and realistic.
@@ -90,34 +95,8 @@ IMPORTANT:
 - The code must remain synthesizable after the addition of a bug.
 
 
-
-# Better workflow:
-... -> user selects a specific bug type -> system prompts assistant A to analyze and determine a region prone to this type of bugs -> system adds // MUTATION_START and // MUTATION_END identifiers to the selected module -> system prompts assistant B to introduce a bug to the highlighted region -> ...
-* system can save information about the region to avoid try duplication
-
-
-# 2-assistant approach prompt:
-
-# A
-You are a part of a mutation testing system for hardware designs written in Verilog. Your role is to analyze Verilog code snippets and determine regions prone to specific bug types, to which those bugs can be introduced to test the robustness of the design's verification infrastructure. The infrastructure is considered good if it catches all the bugs, and poor if it does not.
-
-Your task is to determine one region prone to **stuck-at zero** type of bugs.
-
-Return the result exclusively in JSON format, with the following requirements:
-- The JSON must contain exactly three properties: 'region', 'start', and 'end'.
-- 'region', 'start', and 'end' must be strings.
-- 'region' must contain the selected code region. It should be a complete copy of a snippet from the provided module.
-- 'start' must contain the first line of the selected region.
-- 'end' must contain the last line of the selected region.
-
-Example JSON response:
-{
-    "region": "if (CVA6Cfg.IS_XLEN64) begin\n      unique case (fu_data_i.operation)\n        // Add word: Ignore the upper bits and sign extend to 64 bit\n        ADDW, SUBW: result_o = {{CVA6Cfg.XLEN - 32{adder_result[31]}}, adder_result[31:0]};\n        SH1ADDUW, SH2ADDUW, SH3ADDUW: result_o = adder_result;\n        // Shifts 32 bit\n        SLLW, SRLW, SRAW:\n        result_o = {{CVA6Cfg.XLEN - 32{shift_result32[31]}}, shift_result32[31:0]};\n        default: ;\n      endcase\n    end",
-    "start": "if (CVA6Cfg.IS_XLEN64) begin",
-    "end": "end"
-}
-
-IMPORTANT:
-- The JSON response must not include dictionaries, lists, or any non-string data types for the 'region', 'start', and 'end' values.
-
-# B
+# TODO:
+    [ ] Dive deep into Certitude
+    [ ] Get details about Certitude bug types
+    [ ] How does code interpreter work?
+    [ ] Do code interpreter & file search improve output? --> *file search cannot access .sv files
