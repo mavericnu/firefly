@@ -106,9 +106,14 @@ Hardware module for context:
 
 // Wake-up signal based on unregistered IRQ such that wake-up can be caused if no clock is present\n assign irq_wu_ctrl_o = |(irq_i && mie_bypass_i); // Classical human engineering error: incorrect use of logical AND '&&' instead of bitwise AND '&'
 
+"description": "To introduce a 2-cycle delay in the interrupt ID assignment logic, I will modify the code such that the assignment to irq_id_ctrl_o is delayed by two clock cycles. This can be done by adding two registers to hold the intermediate values for two cycles before the final value is assigned to irq_id_ctrl_o. This will delay IRQ response, introducing subtle timing issues.", "code": " logic [4:0] irq_id_ctrl_intermediate1;\n logic [4:0] irq_id_ctrl_intermediate2;\n\n always_ff @(posedge clk, negedge rst_n)\n begin\n if (rst_n == 1'b0) begin\n irq_id_ctrl_intermediate1 <= 5'd0;\n irq_id_ctrl_intermediate2 <= 5'd0;\n irq_id_ctrl_o <= 5'd0;\n end else begin\n irq_id_ctrl_intermediate1 <= irq_id_ctrl_intermediate2;\n irq_id_ctrl_intermediate2 <= irq_local_qual[31] ? 5'd31 :\n irq_local_qual[30] ? 5'd30 :\n irq_local_qual[29] ? 5'd29 :\n irq_local_qual[28] ? 5'd28 :\n irq_local_qual[27] ? 5'd27 :\n irq_local_qual[26] ? 5'd26 :\n irq_local_qual[25] ? 5'd25 :\n irq_local_qual[24] ? 5'd24 :\n irq_local_qual[23] ? 5'd23 :\n irq_local_qual[22] ? 5'd22 :\n irq_local_qual[21] ? 5'd21 :\n irq_local_qual[20] ? 5'd20 :\n irq_local_qual[19] ? 5'd19 :\n irq_local_qual[18] ? 5'd18 :\n irq_local_qual[17] ? 5'd17 :\n irq_local_qual[16] ? 5'd16 :\n irq_local_qual[15] ? 5'd15 :\n irq_local_qual[14] ? 5'd14 :\n irq_local_qual[13] ? 5'd13 :\n irq_local_qual[12] ? 5'd12 :\n irq_local_qual[CSR_MEIX_BIT] ? CSR_MEIX_BIT :\n irq_local_qual[CSR_MSIX_BIT] ? CSR_MSIX_BIT :\n irq_local_qual[CSR_MTIX_BIT] ? CSR_MTIX_BIT :\n irq_local_qual[10] ? 5'd10 :\n irq_local_qual[ 2] ? 5'd2 :\n irq_local_qual[ 6] ? 5'd6 :\n irq_local_qual[ 9] ? 5'd9 :\n irq_local_qual[ 1] ? 5'd1 :\n irq_local_qual[ 5] ? 5'd5 :\n irq_local_qual[ 8] ? 5'd8 :\n irq_local_qual[ 0] ? 5'd0 :\n irq_local_qual[ 4] ? 5'd4 :\n CSR_MTIX_BIT;\n irq_id_ctrl_o <= irq_id_ctrl_intermediate1;\n end\n end"
 
 # TODO:
     [ ] Dive deep into Certitude
     [ ] Get details about Certitude bug types
     [ ] How does code interpreter work?
     [ ] Do code interpreter & file search improve output? --> *file search cannot access .sv files
+    [ ] Sliding window with stuck-at-0 to measure the success rate:
+        Compare small vs large files
+        Window size -> n number of lines
+        Success -> # of successful replacements & runs on the hello world test -> #successful_runs / #total_runs
