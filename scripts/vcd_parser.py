@@ -1,3 +1,6 @@
+# Copyright (c) 2024 Maveric @ NU and Texer.ai.
+# All rights reserved.
+
 import re
 import os
 
