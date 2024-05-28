@@ -117,3 +117,24 @@ Hardware module for context:
         Compare small vs large files
         Window size -> n number of lines
         Success -> # of successful replacements & runs on the hello world test -> #successful_runs / #total_runs
+
+
+
+# EXAMPLE OUTPUT
+Bug type: stuck-at-0
+Code:
+```Verilog
+// Copyright 2018 ETH Zurich and University of Bologna.
+// Copyright and related rights are licensed under the Solderpad Hardware
+// License, Version 0.51 (the "License"); you may not use this file except in
+// compliance with the License.  You may obtain a copy of the License at
+// http://solderpad.org/licenses/SHL-0.51. Unless required by applicable law
+
+```
+Assistant Response (JSON): {
+    "explanation": "To introduce a stuck-at-0 fault in the provided Interrupt Controller module, I will select a logic signal that plays a crucial role in the operation of the module and alter it so that it is always zero. This will effectively disable certain functionalities related to that signal. In this case, I will modify the 'irq_sec_q' signal in the always_ff block, which ensures this signal always stays at 0, disrupting any secure interrupt logic in the system.",
+    "code": "module cv32e40p_int_controller import cv32e40p_pkg::*;\n#(\n  parameter PULP_SECURE = 0\n)\n(\n  input  logic        clk,\n  input  logic        rst_n,\n\n  // External interrupt lines\n  input  logic [31:0] irq_i,                    // Level-triggered interrupt inputs\n  input  logic        irq_sec_i,                // Interrupt secure bit from EU\n\n  // To cv32e40p_controller\n  output logic        irq_req_ctrl_o,\n  output logic        irq_sec_ctrl_o,\n  output logic  [4:0] irq_id_ctrl_o,\n  output logic        irq_wu_ctrl_o,\n\n  // To/from cv32e40p_cs_registers\n  input  logic [31:0] mie_bypass_i,             // MIE CSR (bypass)\n  output logic [31:0] mip_o,                    // MIP CSR\n  input  logic        m_ie_i,                   // Interrupt enable bit from CSR (M mode)\n  input  logic        u_ie_i,
+
+
+!!! DO WE REALLY NEED THE LAST LINE IN THE IMPORTANT SECTION:
+- If it is not possible to rewrite the provided code with a bug (for example, if the snippet contains only comments), include the reasoning in the 'explanation' and return an empty string in the 'code' field.
