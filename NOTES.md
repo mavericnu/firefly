@@ -11,9 +11,9 @@
         2. system inserts a bug
         3. system runs a test suite 
 
-# Questionably better workflow:
-... -> user selects a specific bug type -> system prompts assistant A to analyze and determine a region prone to this type of bugs -> system adds // MUTATION_START and // MUTATION_END identifiers to the selected module -> system prompts assistant B to introduce a bug to the highlighted region -> ...
-* system can save information about the region to avoid try duplication
+## Questionably better workflow:
+    ... -> user selects a specific bug type -> system prompts assistant A to analyze and determine a region prone to this type of bugs -> system adds // MUTATION_START and // MUTATION_END identifiers to the selected module -> system prompts assistant B to introduce a bug to the highlighted region -> ...
+    *system can save information about the region to avoid try duplication
 
 
 # Firefly bug types
@@ -71,19 +71,19 @@ Hardware module for context:
 {}
 ```
 
-# Details that can be added to the prompt
+## Details that can be added to the prompt
 - If it is not possible to rewrite the provided code with a bug (for example, if the snippet contains only comments), include the reasoning in the 'explanation' and return an empty string in the 'code' field.
 
 
 # TODO:
-    - [ ] Get details about Certitude bug types. Dive deep into the tool itself.
-    - [x] Do code interpreter & file search improve output?
-        File search is useless in our case. On top of that, it cannot access .sv files.
-        Code interpreter may be beneficial even if it does not run Verilog natively.
-            - [ ] Try changing the configuration of the assistant.
-    - [ ] Sliding window with stuck-at-0 to measure the success rate:
+- [ ] Get details about Certitude bug types. Dive deep into the tool itself.
+- [x] Do code interpreter & file search improve output?
+    File search is useless in our case. On top of that, it cannot access .sv files.
+    Code interpreter may be beneficial even if it does not run Verilog natively.
+        - [ ] Try changing the configuration of the assistant.
+- [ ] Sliding window with stuck-at-0 to measure the success rate:
         Compare small vs large files
         Window size -> n number of lines
         Success -> # of successful replacements & runs on the hello world test -> #successful_runs / #total_runs
         Preprocessing: remove all comments & whitespaces
-    - [ ] Run UVM Tests following Mike's instructions
+- [ ] Run UVM Tests following Mike's instructions
