@@ -33,14 +33,9 @@ IMPORTANT:
 
 '''
 
-api_key = os.getenv("OPENAI_API_KEY")
-if not api_key:
-    raise ValueError("OPENAI_API_KEY environment variable not set")
-
-assistant_id = os.getenv("ASSISTANT_ID")
-if not assistant_id:
-    raise ValueError("ASSISTANT_ID environment variable not set")
-
+api_key, assistant_id = os.getenv("OPENAI_API_KEY"), os.getenv("ASSISTANT_ID")
+if not api_key or not assistant_id:
+    raise ValueError("Environment variables not set")
 
 client = OpenAI(api_key=api_key)
 
@@ -96,3 +91,26 @@ for i in range(len(lines) - 4):
 
 
 client.beta.threads.delete(thread_id=thread.id)
+
+
+def main():
+    with open("cv32e40p_int_controller.sv", "r") as file:
+        lines = file.readlines()
+
+    new_lines = []
+    for line in lines:
+        line.strip()
+        if line.startswith("//") or line == "\n":
+            continue
+        if "//" in line:
+            half = line.split("//")[0].strip()
+            new_lines.append(half)
+            continue
+        new_lines.append(line)
+
+    for line in new_lines:
+        print(line)
+
+
+if __name__ == "__main__":
+    main()
