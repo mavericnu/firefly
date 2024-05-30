@@ -50,67 +50,67 @@ assistant = client.beta.assistants.update(
 )
 
 
-thread = client.beta.threads.create()
-
-bug_type = "stuck-at-0"
-
-with open("cv32e40p_int_controller.sv", "r") as file:
-    lines = file.readlines()
-
-for i in range(len(lines) - 4):
-    snippet = "".join(lines[i:i+5])
-
-    content = f"Bug type: {bug_type}\nCode:\n```Verilog\n{snippet}\n```"
-    message = client.beta.threads.messages.create(
-        thread_id=thread.id,
-        role="user",
-        content=content
-    )
-
-    run = client.beta.threads.runs.create_and_poll(
-        thread_id=thread.id,
-        assistant_id=assistant.id,
-    )
-
-    if run.status == 'completed':
-        responses = client.beta.threads.messages.list(thread_id=thread.id)
-        for response in responses.data:
-            if response.role != "user":
-                response_content = response.content[0].text.value
-                try:
-                    response_json = json.loads(response_content)
-                    print("Assistant Response (JSON):",
-                          json.dumps(response_json, indent=4))
-                except json.JSONDecodeError:
-                    print("Failed to parse JSON response")
-    else:
-        print(f"Run status: {run.status}")
-
-    if i == 0:
-        break
 
 
-client.beta.threads.delete(thread_id=thread.id)
+
+def preprocess(fname):
+    with open(fname, "r") as file:
+        lines = file.readlines()
+
+    new_lines = [
+        line.split("//")[0].strip() if "//" in line else line.strip()
+        for line in lines
+        if line.strip() and not line.strip().startswith("//")
+    ]
+
+    with open(f"preprocessed_{fname}", "w") as file:
+        file.write("\n".join(new_lines))
 
 
 def main():
-    with open("cv32e40p_int_controller.sv", "r") as file:
+    preprocess("cv32e40p_int_controller.sv")
+
+    thread = client.beta.threads.create()
+
+    bug_type = "stuck-at-0"
+
+    with open("preprocessed_cv32e40p_int_controller.sv", "r") as file:
         lines = file.readlines()
 
-    new_lines = []
-    for line in lines:
-        line.strip()
-        if line.startswith("//") or line == "\n":
-            continue
-        if "//" in line:
-            half = line.split("//")[0].strip()
-            new_lines.append(half)
-            continue
-        new_lines.append(line)
+    for i in range(len(lines) - 4):
+        snippet = "".join(lines[i:i+5])
 
-    for line in new_lines:
-        print(line)
+        content = f"Bug type: {bug_type}\nCode:\n```Verilog\n{snippet}\n```"
+        message = client.beta.threads.messages.create(
+            thread_id=thread.id,
+            role="user",
+            content=content
+        )
 
+        run = client.beta.threads.runs.create_and_poll(
+            thread_id=thread.id,
+            assistant_id=assistant.id,
+        )
+
+        if run.status == 'completed':
+            responses = client.beta.threads.messages.list(thread_id=thread.id)
+            for response in responses.data:
+                if response.role != "user":
+                    response_content = response.content[0].text.value
+                    try:
+                        response_json = json.loads(response_content)
+                        print("Assistant Response (JSON):",
+                            json.dumps(response_json, indent=4))
+                    except json.JSONDecodeError:
+                        print("Failed to parse JSON response")
+        else:
+            print(f"Run status: {run.status}")
+
+        if i == 3:
+            break
+
+
+    client.beta.threads.delete(thread_id=thread.id)
 
 if __name__ == "__main__":
     main()
