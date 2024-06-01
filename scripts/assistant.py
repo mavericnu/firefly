@@ -33,6 +33,9 @@ IMPORTANT:
 
 '''
 
+FILE = "cv32e40p_int_controller.sv"
+
+
 api_key, assistant_id = os.getenv("OPENAI_API_KEY"), os.getenv("ASSISTANT_ID")
 if not api_key or not assistant_id:
     raise ValueError("Environment variables not set")
@@ -41,16 +44,14 @@ client = OpenAI(api_key=api_key)
 
 assistant = client.beta.assistants.retrieve(assistant_id=assistant_id)
 
-# This variable should be updated to select other modules
-module = open("cv32e40p_int_controller.sv", "r").read()
+module = open(FILE, "r").read()
+
 context = f"Hardware module for context:\n```Verilog\n{module}\n```"
+
 assistant = client.beta.assistants.update(
     assistant_id=assistant.id,
     instructions=INSTRUCTIONS + context
 )
-
-
-
 
 
 def preprocess(fname):
@@ -68,19 +69,20 @@ def preprocess(fname):
 
 
 def main():
-    preprocess("cv32e40p_int_controller.sv")
+    preprocess(FILE)
 
     thread = client.beta.threads.create()
 
     bug_type = "stuck-at-0"
 
-    with open("preprocessed_cv32e40p_int_controller.sv", "r") as file:
+    with open(f"preprocessed_{FILE}", "r") as file:
         lines = file.readlines()
 
-    for i in range(len(lines) - 4):
+    for i in range(10, len(lines) - 4):
         snippet = "".join(lines[i:i+5])
 
         content = f"Bug type: {bug_type}\nCode:\n```Verilog\n{snippet}\n```"
+
         message = client.beta.threads.messages.create(
             thread_id=thread.id,
             role="user",
@@ -99,18 +101,15 @@ def main():
                     response_content = response.content[0].text.value
                     try:
                         response_json = json.loads(response_content)
-                        print("Assistant Response (JSON):",
-                            json.dumps(response_json, indent=4))
+                        explanation = response_json["explanation"]
+                        code = response_json["code"]
                     except json.JSONDecodeError:
                         print("Failed to parse JSON response")
         else:
             print(f"Run status: {run.status}")
-
-        if i == 3:
-            break
-
-
+    
     client.beta.threads.delete(thread_id=thread.id)
+
 
 if __name__ == "__main__":
     main()
