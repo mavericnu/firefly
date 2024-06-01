@@ -80,7 +80,7 @@ Hardware module for context:
 - [x] Do code interpreter & file search improve output?
     File search is useless in our case. On top of that, it cannot access .sv files.
     Code interpreter may be beneficial even if it does not run Verilog natively.
-        - [ ] Try changing the configuration of the assistant.
+- [ ] Try changing the configuration of the assistant: a) using code interpreter and b) removing the explanation field.
 - [ ] Sliding window with stuck-at-0 to measure the success rate:
         Compare small vs large files
         Window size -> n number of lines
