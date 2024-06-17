@@ -87,3 +87,6 @@ Hardware module for context:
         Success -> # of successful replacements & runs on the hello world test -> #successful_runs / #total_runs
         Preprocessing: remove all comments & whitespaces
 - [ ] Run UVM Tests following Mike's instructions
+- [ ] Integrate Dromajo into the CV32E40P environment
+- [ ] Determine binary files used for verification
+- [ ] Find how to get coverage information from Questa
