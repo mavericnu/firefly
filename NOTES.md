@@ -76,88 +76,17 @@ Hardware module for context:
 
 
 # TODO:
-- [ ] Get details about Certitude bug types. Dive deep into the tool itself.
-- [x] Do code interpreter & file search improve output?
-    File search is useless in our case. On top of that, it cannot access .sv files.
-    Code interpreter may be beneficial even if it does not run Verilog natively.
-- [ ] Try changing the configuration of the assistant: a) using code interpreter and b) removing the explanation field.
-- [ ] Sliding window with stuck-at-0 to measure the success rate:
-        Compare small vs large files
-        Window size -> n number of lines
-        Success -> # of successful replacements & runs on the hello world test -> #successful_runs / #total_runs
-        Preprocessing: remove all comments & whitespaces
-- [ ] Run UVM Tests following Mike's instructions
-- [ ] Integrate Dromajo into the CV32E40P environment
-- [ ] Determine binary files used for verification
+## General
+- [ ] Get details about Certitude bug types
+- [ ] Experiment with assistant configuration: a) using code interpreter and b) removing the explanation field.
 - [ ] Find how to get coverage information from Questa
 
-<!-- Imperas... ???? -->
-vendor_lib/imperas/imperas_DV_COREV/sv/imperas_CV32.sv
-vendor_lib/imperas/imperas_DV_COREV/README.md:
-vendor_lib/imperas/imperas_DV_COREV/ChangeLog.md
-vendor_lib/imperas/design/typedefs.sv
-vendor_lib/imperas/design/monitor.sv
-vendor_lib/imperas/design/ram.sv
+## CV32E40P
+- [ ] Determine binary files used for UVM verification
+- [ ] Run UVM VE
 
-<!-- SystemVerilog Testbench configs -->
-vendor_lib/verissimo/waivers.xml
+## Ibex
+- [ ] 
 
-<!-- ??? -->
-.metrics.json
-
-<!-- DOCS -->
-docs/VerifStrat/source/cv32_env.rst
-docs/VerifStrat/source/quick_start.rst
-docs/VerifStrat/source/pulp_verif.rst
-
-<!-- Reusable verification components: UVM Agents: ??? -->
-lib/uvm_agents/uvma_core_cntrl/uvma_core_cntrl_cfg.sv
-lib/uvm_agents/uvma_rvvi_ovpsim/uvma_rvvi_ovpsim_agent.sv
-
-<!-- Common makefiles -->
-mk/README.md
-[!!!] mk/Common.mk
-mk/uvmt/vcs.mk
-mk/uvmt/riviera.mk
-[!!!] mk/uvmt/uvmt.mk
-mk/uvmt/dsim.mk
-mk/uvmt/xrun.mk
-[!!!] mk/uvmt/vsim.mk
-mk/uvmt/dvt.mk
-[!!!] mk/core/core.mk
-
-
-<!-- Source files used to support the Imperas ISS -->
-cv32e40p/vendor_lib/imperas/riscv_CV32E40P_OVPsim/sv/riscv_CV32E40P.h
-cv32e40p/vendor_lib/imperas/riscv_CV32E40P_OVPsim/sv/riscv_datatype.h
-cv32e40p/vendor_lib/README.md
-
-<!-- Imperas ISS options -->
-cv32e40p/tests/cfg/pulp.yaml
-
-<!-- Tests: ??? -->
-cv32e40p/tests/programs/custom/all_csr_por/all_csr_por.c
-cv32e40p/tests/programs/custom/modeled_csr_por/modeled_csr_por.c
-cv32e40p/tests/programs/custom/requested_csr_por/requested_csr_por.c
-cv32e40p/tests/programs/custom/fibonacci/fibonacci.c
-
-<!-- Tool specific sub-dirs for some of the tools used in the CV32E40P -->
-cv32e40p/sim/tools/imperas/README.md
-cv32e40p/sim/tools/README.md
-cv32e40p/sim/tools/xrun/restore.tcl
-cv32e40p/sim/tools/xrun/restore.tcl.svcf
-
-<!-- Testbench: Testbench for CV32E40P:  -->
-<!-- Module wrapper for Imperas OVP -->
-cv32e40p/tb/uvmt/uvmt_cv32e40p_iss_wrap.sv
-<!-- Step and Compare between the CV32E40P and Imperas OVPsim -->
-cv32e40p/tb/uvmt/uvmt_cv32e40p_step_compare.sv
-
-cv32e40p/tb/uvmt/imperas_iss.flist
-<!-- Coverage model ??? -->
-cv32e40p/env/uvme/cov/uvme_rv32isa_covg.sv
-
-
-binary
-compatibility
-no imperas yes dromajo - what files should we change
+## Black Parrot
+- [ ] 
