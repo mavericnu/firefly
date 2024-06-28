@@ -82,11 +82,20 @@ Hardware module for context:
 - [ ] Find how to get coverage information from Questa
 
 ## CV32E40P
+- V1.0.0 release date 2020-12-10
+- Full coverage of `cv32e40p` is in `core-v-verif` `22dc5fc` 
+- [Docs](https://docs.openhwgroup.org/projects/core-v-verif/en/latest/cv32_env.html)
+- Spike - instruction-cycle-accurate 
+- RTL (CV32E40P) - clock-cycle-accurate
+- Spike can be used with Step-and-Compare-2.0
+- Step-and-Compare-2.0 is an alternative to RVVI + ImperasDV. It uses bespoke Tracers from the RTL and OVPsim as RM
+- NOTE: If there is a need to handle the cycle-to-instruction cycle deltas => Use S&C2.0 => The deltas need to be handled in the VE + Unique for each core
 - [ ] Determine binary files used for UVM verification
 - [ ] Run UVM VE
 
 ## Ibex
-- [ ] 
+- [Docs](https://ibex-core.readthedocs.io/en/latest/02_user/index.html)
+- [ ] Run co-simulation using Questa
 
 ## Black Parrot
-- [ ] 
+- [ ] Update CI scripts to use Questa
