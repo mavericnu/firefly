@@ -77,7 +77,7 @@ Hardware module for context:
 
 # TODO:
 ## General
-- [ ] Get details about Certitude bug types
+- [x] Get details about Certitude bug types
 - [ ] Experiment with assistant configuration: a) using code interpreter and b) removing the explanation field.
 - [ ] Find how to get coverage information from Questa
 
