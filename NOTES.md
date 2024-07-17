@@ -94,8 +94,16 @@ Hardware module for context:
 - [ ] Run UVM VE
 
 ## Ibex
+- Command to run a single test: `make --keep-going IBEX_CONFIG=opentitan SIMULATOR=questa ISS=spike ITERATIONS=1 SEED=1 TEST=riscv_arithmetic_basic_test WAVES=0 COV=0 VERBOSE=1`
+- Time measurements: 1 test execution takes ~11 minutes (~8 minutes for compilation)
 - [Docs](https://ibex-core.readthedocs.io/en/latest/02_user/index.html)
-- [ ] Run co-simulation using Questa
+- [x] Run co-simulation using Questa
+- [x] Update pass/fail script
+- [ ] Measure simulation time
+- [ ] Check if simulation results align with the reported ones
+- [ ] Turn on parallel execution & measure time
+- [ ] Find optimal number of iterations & measure time
+- [ ] Add support for Questa coverage
 
 ## Black Parrot
 - [ ] Update CI scripts to use Questa
