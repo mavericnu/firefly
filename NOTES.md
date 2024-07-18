@@ -99,7 +99,7 @@ Hardware module for context:
 - [Docs](https://ibex-core.readthedocs.io/en/latest/02_user/index.html)
 - [x] Run co-simulation using Questa
 - [x] Update pass/fail script
-- [ ] Measure simulation time
+- [x] Measure simulation time: 4313m31.938s
 - [ ] Check if simulation results align with the reported ones
 - [ ] Turn on parallel execution & measure time
 - [ ] Find optimal number of iterations & measure time
