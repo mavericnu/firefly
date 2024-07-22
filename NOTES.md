@@ -95,14 +95,15 @@ Hardware module for context:
 
 ## Ibex
 - Command to run a single test: `make --keep-going IBEX_CONFIG=opentitan SIMULATOR=questa ISS=spike ITERATIONS=1 SEED=1 TEST=riscv_arithmetic_basic_test WAVES=0 COV=0 VERBOSE=1`
+- Command to run a full regression: `make --keep-going IBEX_CONFIG=opentitan SIMULATOR=questa ISS=spike WAVES=0 COV=0`
 - Time measurements: 1 test execution takes ~11 minutes (~8 minutes for compilation)
 - [Docs](https://ibex-core.readthedocs.io/en/latest/02_user/index.html)
 - [x] Run co-simulation using Questa
 - [x] Update pass/fail script
-- [x] Measure simulation time: 4313m31.938s
-- [ ] Check if simulation results align with the reported ones
+- [x] Measure simulation time: `4313m31.938s`
+- [x] Check if simulation results align with the reported ones
+- [x] Find optimal number of iterations & measure time
 - [ ] Turn on parallel execution & measure time
-- [ ] Find optimal number of iterations & measure time
 - [ ] Add support for Questa coverage
 
 ## Black Parrot
