@@ -2,37 +2,37 @@
 # export CI_CORES=4
 
 # ===== check =====
-bash ci/check_design.sh $CI_CORES
-bash ci/lint.sh verilator $CI_CORES
-bash ci/yosys.sh $CI_CORES
+bash ci/check_design.sh 
+bash ci/lint.sh verilator 
+bash ci/yosys.sh 
 
 
 # ===== test-short =====
 # vcs only
-bash ci/bloodgraph.sh $CI_CORES
-bash ci/dcache_regress.sh verilator $CI_CORES
-bash ci/icache_regress.sh verilator $CI_CORES
+bash ci/bloodgraph.sh 
+bash ci/dcache_regress.sh verilator 
+bash ci/icache_regress.sh verilator
 
-bash ci/me_regress.sh verilator $CI_CORES
-bash ci/single_core_atomics.sh verilator $CI_CORES
-bash ci/single_core_testlist.sh verilator RISCV_TESTLIST $CI_CORES
-bash ci/weird_config.sh verilator $CI_CORES
+bash ci/me_regress.sh verilator 
+bash ci/single_core_atomics.sh verilator 
+bash ci/single_core_testlist.sh verilator RISCV_TESTLIST 
+bash ci/weird_config.sh verilator 
 
 
 # ===== test-medium =====
-bash ci/check_loops.sh $CI_CORES
-bash ci/l2e_config.sh verilator $CI_CORES
-bash ci/surelog.sh $CI_CORES
+bash ci/check_loops.sh 
+bash ci/l2e_config.sh verilator 
+bash ci/surelog.sh 
 
 # vcs only
-bash ci/accelerator.sh verilator $CI_CORES
+bash ci/accelerator.sh verilator 
 
-bash ci/checkpoint.sh verilator $CI_CORES
-bash ci/single_core_testlist.sh verilator MISC_TESTLIST $CI_CORES
+bash ci/checkpoint.sh verilator 
+bash ci/single_core_testlist.sh verilator MISC_TESTLIST 
 
 
 # ===== test-long =====
-bash ci/single_core_testlist.sh verilator BEEBS_TESTLIST $CI_CORES
-bash ci/single_core_testlist.sh verilator COREMARK_TESTLIST $CI_CORES
+bash ci/single_core_testlist.sh verilator BEEBS_TESTLIST 
+bash ci/single_core_testlist.sh verilator COREMARK_TESTLIST 
 
 } > output.txt 2>&1

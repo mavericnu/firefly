@@ -101,10 +101,20 @@ Hardware module for context:
 - [x] Run co-simulation using Questa
 - [x] Update pass/fail script
 - [x] Measure simulation time: `4313m31.938s`
-- [x] Check if simulation results align with the reported ones
-- [x] Find optimal number of iterations & measure time
-- [ ] Turn on parallel execution & measure time
-- [ ] Add support for Questa coverage
+- [x] Check if simulation results align with the reported ones: No, there are particular tests that fail when ran with Questa.
+- [x] Find optimal number of iterations & measure time: There is no optimal number of iterations because the verification infrastructure uses riscv-dv.
+- [x] Turn on parallel execution & measure time: `276m21.769s`
+
+### FAILING TESTS
+riscv_debug_instr_test      | Cosim mismatch Synchronous trap was expected at ISS PC
+riscv_debug_wfi_test        | Cosim mismatch Synchronous trap was expected at ISS PC
+riscv_interrupt_wfi_test    | Cosim mismatch Synchronous trap was expected at ISS PC
+riscv_pc_intg_test          | Unable to read value from 'core_ibex_tb_top.dut.u_ibex_top.u_ibex_core.core_busy_o'
+riscv_rf_ctrl_intg_test     | Unable to read value from 'core_ibex_tb_top.dut.u_ibex_top.gen_regfile_ff.register_file_i.we_a_dec'
+riscv_ram_intg_test         | Unable to read value from 'core_ibex_tb_top.dut.u_ibex_top.gen_rams.gen_rams_inner[1].gen_scramble_rams.tag_bank.u_prim_ram_1p_adv.rvalid_sram_d'
+riscv_rf_intg_test          | trace_core_00000000.log not found
+riscv_icache_intg_test      | trace_core_00000000.log not found
+
 
 ## Black Parrot
 - [ ] Update CI scripts to use Questa
