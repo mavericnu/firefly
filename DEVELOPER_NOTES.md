@@ -76,11 +76,6 @@ Hardware module for context:
 
 
 # TODO:
-## General
-- [x] Get details about Certitude bug types
-- [ ] Experiment with assistant configuration: a) using code interpreter and b) removing the explanation field.
-- [ ] Find how to get coverage information from Questa
-
 ## CV32E40P
 - V1.0.0 release date 2020-12-10
 - Full coverage of `cv32e40p` is in `core-v-verif` `22dc5fc` 
