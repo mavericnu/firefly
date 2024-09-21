@@ -4,9 +4,11 @@
 import os
 import anthropic
 
-client = anthropic.Anthropic(
-    api_key=os.environ.get("ANTHROPIC_API_KEY"),
-)
+api_key = os.getenv("ANTHROPIC_API_KEY")
+if not api_key:
+    raise ValueError("ANTHROPIC_API_KEY environment variable not set")
+
+client = anthropic.Anthropic(api_key=api_key)
 
 message = client.messages.create(
     model="claude-3-5-sonnet-20240620",
@@ -17,3 +19,6 @@ message = client.messages.create(
 )
 
 print(message.content)
+
+def hello_world():
+    print("Hello, World!")
