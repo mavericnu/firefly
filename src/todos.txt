@@ -1,0 +1,10 @@
+    1. Absolute path to the RTL directory.
+    2. Scan the directory and find all the files with the .sv extension.
+    3. Print the results to a config file (.ff).
+    4. Print instructions to the user on how to run the tool.
+    5. Modify the config file as needed.
+        a. How to run design simulations.
+        b. Where to run design simulations.
+        c. How many design simulations to run in parallel.
+    6. Run the tool with the config file.
+    7. Print the results to a report file.
