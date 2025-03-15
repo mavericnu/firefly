@@ -1,15 +1,38 @@
 # Copyright (c) 2024 Maveric @ NU and Texer.ai. All rights reserved.
+import argparse
 from src.prep import prep_simulation
 
 
-def main():
-    success = prep_simulation()
-    if not success:
-        print("Failed to prepare simulation.")
-        return 1
+def parse_args():
+    parser = argparse.ArgumentParser(
+        description="Firefly is an AI-assisted mutation testing system for hardware designs written in Verilog.",
+    )
 
-    # TODO: Mutate
-    # TODO: Run simulation
+    parser.add_argument(
+        "command",
+        choices=["prep", "mutate", "run"],
+        help="The command to execute.",
+    )
+
+    return parser.parse_args()
+
+
+def main():
+    args = parse_args()
+    if args.command == "prep":
+        success = prep_simulation()
+        if not success:
+            print("Failed to prepare simulation.")
+            return 1
+    elif args.command == "mutate":
+        # TODO: Mutate
+        pass
+    elif args.command == "run":
+        # TODO: Run simulation
+        pass
+    else:
+        print("Invalid command.")
+        return 1
 
     return 0
 
