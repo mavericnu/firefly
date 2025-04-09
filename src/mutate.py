@@ -55,14 +55,19 @@ def prompt_model(content):
     data = json.loads(response)
     return data
 
+
 request_timestamps = deque()
+
+
 def _generate_mutations_batch(tasks_to_process, mutations):
     failed_tasks = []
     global request_timestamps
 
     for file_path, mutations_to_request in tasks_to_process:
         current_time = time.time()
-        while request_timestamps and request_timestamps[0] <= current_time - TIME_WINDOW:
+        while (
+            request_timestamps and request_timestamps[0] <= current_time - TIME_WINDOW
+        ):
             request_timestamps.popleft()
         if len(request_timestamps) >= RATE_LIMIT:
             time_since_oldest_allowed = current_time - request_timestamps[0]
@@ -71,13 +76,18 @@ def _generate_mutations_batch(tasks_to_process, mutations):
                 print(f"  -- Rate limit reached. Sleeping for {wait_time:.2f} seconds.")
                 time.sleep(wait_time)
             current_time = time.time()
-            while request_timestamps and request_timestamps[0] <= current_time - TIME_WINDOW:
-                 request_timestamps.popleft()
+            while (
+                request_timestamps
+                and request_timestamps[0] <= current_time - TIME_WINDOW
+            ):
+                request_timestamps.popleft()
 
         request_timestamps.append(time.time())
 
         try:
-            print(f"-- Attempting: {file_path}, requesting {mutations_to_request} mutations.")
+            print(
+                f"-- Attempting: {file_path}, requesting {mutations_to_request} mutations."
+            )
             file_content = read_file(file_path)
             prompt = PROMPT.format(
                 file_path.split("/")[-1], file_content, mutations_to_request
@@ -86,15 +96,21 @@ def _generate_mutations_batch(tasks_to_process, mutations):
             validated_result = validate_mutations(file_path, file_mutations_result)
             mutations[file_path] = validated_result
         except FileNotFoundError:
-             print(f"  -- Failure (File Not Found): {file_path}.")
+            print(f"  -- Failure (File Not Found): {file_path}.")
         except ValueError as ve:
-             print(f"  -- Failure (Validation): {file_path}, Error: {ve}. Will retry if possible.")
-             failed_tasks.append((file_path, mutations_to_request))
+            print(
+                f"  -- Failure (Validation): {file_path}, Error: {ve}. Will retry if possible."
+            )
+            failed_tasks.append((file_path, mutations_to_request))
         except json.JSONDecodeError as jde:
-             print(f"  -- Failure (JSON Parsing): {file_path}, Error: {jde}. Will retry if possible.")
-             failed_tasks.append((file_path, mutations_to_request))
+            print(
+                f"  -- Failure (JSON Parsing): {file_path}, Error: {jde}. Will retry if possible."
+            )
+            failed_tasks.append((file_path, mutations_to_request))
         except Exception as e:
-            print(f"  -- Failure (Other): {file_path}, Error: {e}. Will retry if possible.")
+            print(
+                f"  -- Failure (Other): {file_path}, Error: {e}. Will retry if possible."
+            )
             failed_tasks.append((file_path, mutations_to_request))
 
     return failed_tasks
@@ -120,7 +136,7 @@ def spawn_mutations():
             if i < remaining_mutations:
                 file_mutations_count += 1
             if file_mutations_count > 0:
-                 initial_tasks.append((file_path, file_mutations_count))
+                initial_tasks.append((file_path, file_mutations_count))
     else:
         selected_files = target_files[:num_mutations]
         for file_path in selected_files:
@@ -130,7 +146,9 @@ def spawn_mutations():
     retries = 0
     while tasks_to_process and retries <= MAX_RETRIES:
         if retries > 0:
-            print(f"\n-- Retry Attempt {retries}/{MAX_RETRIES} for {len(tasks_to_process)} failed tasks.")
+            print(
+                f"\n-- Retry Attempt {retries}/{MAX_RETRIES} for {len(tasks_to_process)} failed tasks."
+            )
         else:
             print(f"-- Starting initial processing for {len(tasks_to_process)} tasks.")
 
@@ -139,7 +157,9 @@ def spawn_mutations():
         retries += 1
 
     if tasks_to_process:
-        print(f"\n-- Warning: {len(tasks_to_process)} tasks failed after {MAX_RETRIES} retries.")
+        print(
+            f"\n-- Warning: {len(tasks_to_process)} tasks failed after {MAX_RETRIES} retries."
+        )
         for f_path, _ in tasks_to_process:
             print(f"  -- Final failure: {f_path}")
     else:
