@@ -29,6 +29,13 @@ def create_results_directory():
     print(f"-- Results directory created at '{results_path.absolute()}'.")
 
 
+def spawn_design_copy(design_root_path):
+    sim_dir = "./sim"
+    cmd = f"cp -r {design_root_path} {sim_dir}/"
+    subprocess.run(cmd, shell=True)
+    return f"{sim_dir}/{design_root_path.split("/")[-1]}"
+
+
 def spawn_design_copies(design_root_path, num_jobs):
     sim_dir = "./sim"
     design_copies = []
@@ -110,7 +117,7 @@ def run_simulations():
     design_root_path = config["design_root_path"]
     # cmd = config["cmd"]
     # sim_path = config["sim_path"]
-    num_jobs = int(config["num_jobs"])
+    # num_jobs = int(config["num_jobs"])
 
     mutations = read_json("mutations.json")
     mutation_tuples = []
@@ -119,57 +126,32 @@ def run_simulations():
             mutation_tuples.append((target_file, target_mutation))
 
     total_mutations = len(mutation_tuples)
-    mutations_iter = iter(mutation_tuples)
 
     # Create design copies for parallel execution
-    design_copies = spawn_design_copies(design_root_path, num_jobs)
+    design_copy_path = spawn_design_copy(design_root_path)
 
-    print(
-        f"-- Starting simulations for {total_mutations} mutations using {num_jobs} parallel jobs..."
-    )
+    print(f"-- Starting simulations for {total_mutations} mutations sequentially...")
 
-    # Execute simulations in parallel
+    # Execute simulations iteratively
     results = {}
-    with ProcessPoolExecutor(max_workers=num_jobs) as executor:
-        # Submit initial batch of tasks
-        active_futures = {}
-        for i in range(min(num_jobs, total_mutations)):
-            mutation = next(mutations_iter)
-            design_copy_path = design_copies[i]
-            future = executor.submit(run_simulation, design_copy_path, mutation)
-            active_futures[future] = design_copy_path
+    completed_count = 0
+    failed_count = 0
 
-        print(f"-- Submitted initial {len(active_futures)} tasks.")
-
-        completed_count = 0
-        for future in as_completed(active_futures):
-            design_copy_path = active_futures.pop(future)
-
-            # Handle completed task
-            try:
-                result = future.result()
-                results.update(result)
-                completed_count += 1
-                print(
-                    f"-- Progress: {completed_count}/{total_mutations} simulations completed."
-                )
-            except Exception as e:
-                print(f"-- Simulation task using {design_copy_path} failed: {e}")
-
-            # Submit new task if available
-            try:
-                next_mutation = next(mutations_iter)
-                new_future = executor.submit(
-                    run_simulation, design_copy_path, next_mutation
-                )
-                active_futures[new_future] = design_copy_path
-            except StopIteration:
-                # No more mutations left
-                pass
+    for mutation in mutation_tuples:
+        try:
+            result = run_simulation(design_copy_path, mutation)
+            results.update(result)
+            completed_count += 1
+            print(f"-- Progress: {completed_count}/{total_mutations} simulations completed.")
+        except Exception as e:
+            failed_count += 1
+            print(f"-- Simulation task failed: {e}")
 
     print(
-        f"-- Completed {len(results)} successful simulations out of {total_mutations} total mutations attempted."
+        f"-- Completed {completed_count} successful simulations out of {total_mutations} total mutations attempted."
     )
+    if failed_count > 0:
+        print(f"-- {failed_count} simulations failed.")
 
     ids_file_path = os.path.join("results", "ids.json")
     with open(ids_file_path, "w", encoding="utf-8") as f:
