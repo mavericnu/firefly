@@ -1,6 +1,7 @@
 # Copyright (c) 2024 Maveric @ NU and Texer.ai. All rights reserved.
 import argparse
 from src.prep import prep_simulation
+from src.mutate import spawn_mutations
 
 
 def parse_args():
@@ -25,8 +26,10 @@ def main():
             print("Failed to prepare simulation.")
             return 1
     elif args.command == "mutate":
-        # TODO: Mutate
-        pass
+        success = spawn_mutations()
+        if not success:
+            print("Failed to generate mutations.")
+            return 1
     elif args.command == "run":
         # TODO: Run simulation
         pass

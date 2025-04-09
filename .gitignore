@@ -1,8 +1,9 @@
 # Simulation directory
 sim/
 
-# Config file
+# Local JSON files
 config.json
+mutations.json
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
