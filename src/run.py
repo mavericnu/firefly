@@ -81,14 +81,12 @@ def _collect_simulation_results(design_copy_path, results_dir):
 
 def _clean_simulation_artifacts(design_copy_path):
     output_file = os.path.join(design_copy_path, "execute-tests-output.txt")
-    if os.path.exists(output_file):
-        subprocess.run(f"rm {output_file}", shell=True, executable="/bin/bash")
+    subprocess.run(f"rm {output_file}", shell=True, executable="/bin/bash")
+
     sim_dir = f"{design_copy_path}/verif/sim"
     subprocess.run(f"cd {sim_dir} && make clean_all", shell=True, executable="/bin/bash")
-    if os.path.exists(f"{sim_dir}/logfile.log"):
-        subprocess.run(f"cd {sim_dir} && rm logfile.log", shell=True, executable="/bin/bash")
-    if os.path.exists(f"{sim_dir}/out_*"):
-        subprocess.run(f"cd {sim_dir} && rm -rf out_*", shell=True, executable="/bin/bash")
+    subprocess.run(f"cd {sim_dir} && rm logfile.log", shell=True, executable="/bin/bash")
+    subprocess.run(f"cd {sim_dir} && rm -rf out_*", shell=True, executable="/bin/bash")
 
 
 def run_simulation(design_copy_path, mutation):
