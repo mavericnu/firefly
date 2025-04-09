@@ -32,7 +32,7 @@ def create_results_directory():
 def spawn_design_copy(design_root_path):
     sim_dir = "./sim"
     cmd = f"cp -r {design_root_path} {sim_dir}/"
-    subprocess.run(cmd, shell=True)
+    subprocess.run(cmd, shell=True, executable="/bin/bash")
     return f"{sim_dir}/{design_root_path.split("/")[-1]}"
 
 
@@ -44,7 +44,7 @@ def spawn_design_copies(design_root_path, num_jobs):
         if not os.path.exists(job_dir):
             os.makedirs(job_dir)
         cmd = f"cp -r {design_root_path}/* {job_dir}/"
-        subprocess.run(cmd, shell=True)
+        subprocess.run(cmd, shell=True, executable="/bin/bash")
         design_copies.append(job_dir)
     return design_copies
 
@@ -64,39 +64,41 @@ def _apply_mutation(target_file, mutation_data):
 
 def _execute_simulation(design_copy_path):
     cmd = f"cd {design_copy_path} && source execute-tests.sh"
-    subprocess.run(cmd, shell=True, capture_output=True, text=True)
+    subprocess.run(cmd, shell=True, capture_output=True, executable="/bin/bash", text=True)
 
 
 def _collect_simulation_results(design_copy_path, results_dir):
     output_file = os.path.join(design_copy_path, "execute-tests-output.txt")
     if os.path.exists(output_file):
-        subprocess.run(f"mv {output_file} {results_dir}/", shell=True)
+        subprocess.run(f"cp {output_file} {results_dir}/", shell=True, executable="/bin/bash")
     log_files_path = os.path.join(
-        design_copy_path, "verif/sim/out_*/veri-testharness_sim/*.log.iss"
+        design_copy_path, "verif/sim/out_*/veri-testharness_sim/*"
     )
     subprocess.run(
-        f"mv {log_files_path} {results_dir}/ 2>/dev/null || true", shell=True
+        f"cp {log_files_path} {results_dir}/ 2>/dev/null || true", shell=True, executable="/bin/bash"
     )
 
 
 def _clean_simulation_artifacts(design_copy_path):
     output_file = os.path.join(design_copy_path, "execute-tests-output.txt")
     if os.path.exists(output_file):
-        subprocess.run(f"rm {output_file}", shell=True)
+        subprocess.run(f"rm {output_file}", shell=True, executable="/bin/bash")
     sim_dir = f"{design_copy_path}/verif/sim"
-    subprocess.run(f"cd {sim_dir} && make clean_all", shell=True)
+    subprocess.run(f"cd {sim_dir} && make clean_all", shell=True, executable="/bin/bash")
     if os.path.exists(f"{sim_dir}/logfile.log"):
-        subprocess.run(f"rm {sim_dir}/logfile.log", shell=True)
+        subprocess.run(f"cd {sim_dir} && rm logfile.log", shell=True, executable="/bin/bash")
     if os.path.exists(f"{sim_dir}/out_*"):
-        subprocess.run(f"rm -rf {sim_dir}/out_*", shell=True)
+        subprocess.run(f"cd {sim_dir} && rm -rf out_*", shell=True, executable="/bin/bash")
 
 
 def run_simulation(design_copy_path, mutation):
+    design_copy_path = os.path.abspath(design_copy_path)
     file_path, mutation_data = mutation
     target_file = f"{design_copy_path}/{file_path.split('/cva6/')[-1]}"
 
     unique_id = f"{os.path.basename(file_path)}_{mutation_data['mutation_type']}_{hash(mutation_data['original_code'])}"
     results_dir = os.path.join("results", unique_id)
+    results_dir = os.path.abspath(results_dir)
     os.makedirs(results_dir, exist_ok=True)
 
     original_content = read_file(target_file)
