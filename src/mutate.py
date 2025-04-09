@@ -167,5 +167,5 @@ def spawn_mutations():
 
     print("-- Writing results to mutations.json...")
     with open("mutations.json", "w") as json_file:
-        json.dump(mutations, json_file, indent=4, sort_keys=True)
+        json.dump(mutations, json_file, indent=4)
     return not bool(tasks_to_process)

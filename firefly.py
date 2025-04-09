@@ -2,6 +2,7 @@
 import argparse
 from src.prep import prep_simulation
 from src.mutate import spawn_mutations
+from src.run import run_simulations
 
 
 def parse_args():
@@ -31,12 +32,13 @@ def main():
             print("Failed to generate mutations.")
             return 1
     elif args.command == "run":
-        # TODO: Run simulation
-        pass
+        success = run_simulations()
+        if not success:
+            print("Failed to run simulations.")
+            return 1
     else:
         print("Invalid command.")
         return 1
-
     return 0
 
 
