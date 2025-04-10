@@ -2,7 +2,6 @@ import json
 import os
 import subprocess
 
-from concurrent.futures import ProcessPoolExecutor, as_completed
 from pathlib import Path
 
 
@@ -33,7 +32,7 @@ def spawn_design_copy(design_root_path):
     sim_dir = "./sim"
     cmd = f"cp -r {design_root_path} {sim_dir}/"
     subprocess.run(cmd, shell=True, executable="/bin/bash")
-    return f"{sim_dir}/{design_root_path.split("/")[-1]}"
+    return f"{sim_dir}/{design_root_path.split('/')[-1]}"
 
 
 def spawn_design_copies(design_root_path, num_jobs):
@@ -64,18 +63,24 @@ def _apply_mutation(target_file, mutation_data):
 
 def _execute_simulation(design_copy_path):
     cmd = f"cd {design_copy_path} && source execute-tests.sh"
-    subprocess.run(cmd, shell=True, capture_output=True, executable="/bin/bash", text=True)
+    subprocess.run(
+        cmd, shell=True, capture_output=True, executable="/bin/bash", text=True
+    )
 
 
 def _collect_simulation_results(design_copy_path, results_dir):
     output_file = os.path.join(design_copy_path, "execute-tests-output.txt")
     if os.path.exists(output_file):
-        subprocess.run(f"cp {output_file} {results_dir}/", shell=True, executable="/bin/bash")
+        subprocess.run(
+            f"cp {output_file} {results_dir}/", shell=True, executable="/bin/bash"
+        )
     log_files_path = os.path.join(
         design_copy_path, "verif/sim/out_*/veri-testharness_sim/*"
     )
     subprocess.run(
-        f"cp {log_files_path} {results_dir}/ 2>/dev/null || true", shell=True, executable="/bin/bash"
+        f"cp {log_files_path} {results_dir}/ 2>/dev/null || true",
+        shell=True,
+        executable="/bin/bash",
     )
 
 
@@ -84,8 +89,12 @@ def _clean_simulation_artifacts(design_copy_path):
     subprocess.run(f"rm {output_file}", shell=True, executable="/bin/bash")
 
     sim_dir = f"{design_copy_path}/verif/sim"
-    subprocess.run(f"cd {sim_dir} && make clean_all", shell=True, executable="/bin/bash")
-    subprocess.run(f"cd {sim_dir} && rm logfile.log", shell=True, executable="/bin/bash")
+    subprocess.run(
+        f"cd {sim_dir} && make clean_all", shell=True, executable="/bin/bash"
+    )
+    subprocess.run(
+        f"cd {sim_dir} && rm logfile.log", shell=True, executable="/bin/bash"
+    )
     subprocess.run(f"cd {sim_dir} && rm -rf out_*", shell=True, executable="/bin/bash")
 
 
@@ -142,7 +151,18 @@ def run_simulations():
             result = run_simulation(design_copy_path, mutation)
             results.update(result)
             completed_count += 1
-            print(f"-- Progress: {completed_count}/{total_mutations} simulations completed.")
+            print(
+                f"-- Progress: {completed_count}/{total_mutations} simulations completed."
+            )
+
+            # Dump intermediate results every 5 mutations
+            if completed_count % 5 == 0:
+                ids_file_path = os.path.join("results", "ids.json")
+                with open(ids_file_path, "w", encoding="utf-8") as f:
+                    json.dump(results, f, indent=4)
+                print(
+                    f"-- Intermediate results saved to '{ids_file_path}' after {completed_count} mutations"
+                )
         except Exception as e:
             failed_count += 1
             print(f"-- Simulation task failed: {e}")
@@ -156,5 +176,5 @@ def run_simulations():
     ids_file_path = os.path.join("results", "ids.json")
     with open(ids_file_path, "w", encoding="utf-8") as f:
         json.dump(results, f, indent=4)
-        print(f"-- Unique IDs saved to '{ids_file_path}'")
+    print(f"-- Unique IDs saved to '{ids_file_path}'")
     return True
