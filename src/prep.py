@@ -1,9 +1,11 @@
 # Copyright (c) 2025 Maveric @ NU and Texer.ai. All rights reserved.
 import json
 import os
+
 from pathlib import Path
 
 
+# Define all functions.
 def generate_json_config(config):
     json_path = Path("config.json")
     with open(json_path, "w") as f:

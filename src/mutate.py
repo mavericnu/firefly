@@ -7,6 +7,7 @@ import time
 from collections import deque
 from src.constants import RATE_LIMIT, TIME_WINDOW, MAX_RETRIES, PROMPT
 
+
 # Set up API client.
 genai.configure()
 gemini = genai.GenerativeModel("gemini-2.0-flash-thinking-exp-01-21")

@@ -6,6 +6,7 @@ import subprocess
 from pathlib import Path
 
 
+# Define all functions.
 def read_file(file_path, read_mode="r"):
     with open(file_path, "r") as f:
         if read_mode == "r":
