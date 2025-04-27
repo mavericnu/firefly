@@ -1,4 +1,4 @@
-# Copyright (c) 2024 Maveric @ NU and Texer.ai. All rights reserved.
+# Copyright (c) 2025 Maveric @ NU and Texer.ai. All rights reserved.
 import json
 import os
 from pathlib import Path
@@ -54,12 +54,12 @@ def get_paths():
 
 def get_simulation_parameters():
     num_mutations = input("How many mutations to apply to the design?: ")
-    cmd = input("How to run the simulation?: ")
+    sim_cmd = input("How to run the simulation?: ")
     sim_path = get_valid_directory_path(
         "Enter the absolute path to the simulation directory: "
     )
     num_jobs = input("How many simulations to run in parallel?: ")
-    return num_mutations, cmd, sim_path, num_jobs
+    return num_mutations, sim_cmd, sim_path, num_jobs
 
 
 def create_simulation_directory():
@@ -77,14 +77,14 @@ def prep_simulation():
     sv_files = scan_rtl_directory(rtl_path)
     if not sv_files:
         return False
-    num_mutations, cmd, sim_path, num_jobs = get_simulation_parameters()
+    num_mutations, sim_cmd, sim_path, num_jobs = get_simulation_parameters()
 
     config = {
         "design_root_path": str(design_root_path),
         "rtl_path": str(rtl_path),
         "target_files": sv_files,
         "num_mutations": num_mutations,
-        "cmd": cmd,
+        "sim_cmd": sim_cmd,
         "sim_path": str(sim_path),
         "num_jobs": num_jobs,
     }

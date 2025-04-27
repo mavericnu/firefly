@@ -1,4 +1,4 @@
-# Copyright (c) 2024 Maveric @ NU and Texer.ai. All rights reserved.
+# Copyright (c) 2025 Maveric @ NU and Texer.ai. All rights reserved.
 RATE_LIMIT = 10
 
 TIME_WINDOW = 60

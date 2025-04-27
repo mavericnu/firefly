@@ -1,3 +1,4 @@
+# Copyright (c) 2025 Maveric @ NU and Texer.ai. All rights reserved.
 import json
 import os
 import subprocess
