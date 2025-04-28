@@ -71,10 +71,10 @@ def _collect_simulation_results(
 
 
 def _clean_simulation_artifacts(
-    design_copy_path, output_file, sim_result_path, clean_commands
+    run_sim_path, output_file, sim_result_path, clean_commands
 ):
     # Remove output file
-    output_path = os.path.join(design_copy_path, output_file)
+    output_path = os.path.join(run_sim_path, output_file)
     if os.path.exists(output_path):
         os.remove(output_path)
 
@@ -116,7 +116,7 @@ def run_simulation(design_copy_path, mutation, config):
         config["log_glob"],
     )
     _clean_simulation_artifacts(
-        design_copy_path,
+        config["run_sim_path"],
         config["output_file"],
         sim_result_path,
         config["clean_commands"],
