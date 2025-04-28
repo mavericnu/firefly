@@ -56,12 +56,31 @@ def get_paths():
 
 def get_simulation_parameters():
     num_mutations = input("How many mutations to apply to the design?: ")
-    sim_cmd = input("How to run the simulation?: ")
-    sim_path = get_valid_directory_path(
-        "Enter the absolute path to the simulation directory: "
+    sim_command = input("How to run the simulation?: ")
+    run_sim_path = get_valid_directory_path(
+        "Enter the absolute path to the directory from which to run the simulation: "
     )
+    sim_result_path = get_valid_directory_path(
+        "Enter the absolute path to the directory where simulation results are stored: "
+    )
+    output_file = input(
+        "Enter the name of the output file. It is expected to be in the directory from which the simulation is run: "
+    )
+    log_glob = input("Enter the glob pattern for log files: ")
+    clean_commands = input(
+        "Enter the commands separated by semicolons to clean simulation artifacts: "
+    ).split(";")
     num_jobs = input("How many simulations to run in parallel?: ")
-    return num_mutations, sim_cmd, sim_path, num_jobs
+    return (
+        num_mutations,
+        sim_command,
+        run_sim_path,
+        sim_result_path,
+        output_file,
+        log_glob,
+        clean_commands,
+        num_jobs,
+    )
 
 
 def create_simulation_directory():
@@ -79,16 +98,28 @@ def prep_simulation():
     sv_files = scan_rtl_directory(rtl_path)
     if not sv_files:
         return False
-    num_mutations, sim_cmd, sim_path, num_jobs = get_simulation_parameters()
+    (
+        num_mutations,
+        sim_command,
+        run_sim_path,
+        sim_result_path,
+        output_file,
+        log_glob,
+        clean_commands,
+        num_jobs,
+    ) = get_simulation_parameters()
 
     config = {
         "design_root_path": str(design_root_path),
-        "rtl_path": str(rtl_path),
-        "target_files": sv_files,
         "num_mutations": num_mutations,
-        "sim_cmd": sim_cmd,
-        "sim_path": str(sim_path),
+        "sim_command": sim_command,
+        "run_sim_path": str(run_sim_path),
+        "sim_result_path": str(sim_result_path),
+        "output_file": output_file,
+        "log_glob": log_glob,
+        "clean_commands": clean_commands,
         "num_jobs": num_jobs,
+        "target_files": sv_files,
     }
     generate_json_config(config)
     create_simulation_directory()

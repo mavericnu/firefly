@@ -16,10 +16,7 @@ gemini = genai.GenerativeModel("gemini-2.0-flash-thinking-exp-01-21")
 # Define all functions.
 def read_file(file_path, read_mode="r"):
     with open(file_path, "r") as f:
-        if read_mode == "r":
-            return f.read()
-        elif read_mode == "rl":
-            return f.readlines()
+        return f.readlines() if read_mode == "rl" else f.read()
 
 
 def read_json(json_path):

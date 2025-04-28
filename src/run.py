@@ -9,10 +9,7 @@ from pathlib import Path
 # Define all functions.
 def read_file(file_path, read_mode="r"):
     with open(file_path, "r") as f:
-        if read_mode == "r":
-            return f.read()
-        elif read_mode == "rl":
-            return f.readlines()
+        return f.readlines() if read_mode == "rl" else f.read()
 
 
 def read_json(json_path):
@@ -25,7 +22,6 @@ def create_results_directory():
     if results_path.exists():
         print(f"-- Results directory already exists at '{results_path.absolute()}'.")
         return
-
     results_path.mkdir(parents=True, exist_ok=True)
     print(f"-- Results directory created at '{results_path.absolute()}'.")
 
@@ -34,20 +30,7 @@ def spawn_design_copy(design_root_path):
     sim_dir = "./sim"
     cmd = f"cp -r {design_root_path} {sim_dir}/"
     subprocess.run(cmd, shell=True, executable="/bin/bash")
-    return f"{sim_dir}/{design_root_path.split('/')[-1]}"
-
-
-def spawn_design_copies(design_root_path, num_jobs):
-    sim_dir = "./sim"
-    design_copies = []
-    for i in range(num_jobs):
-        job_dir = os.path.join(sim_dir, f"job_{i}")
-        if not os.path.exists(job_dir):
-            os.makedirs(job_dir)
-        cmd = f"cp -r {design_root_path}/* {job_dir}/"
-        subprocess.run(cmd, shell=True, executable="/bin/bash")
-        design_copies.append(job_dir)
-    return design_copies
+    return os.path.join(sim_dir, os.path.basename(design_root_path))
 
 
 def _write_file(file_path, content):
@@ -63,22 +46,23 @@ def _apply_mutation(target_file, mutation_data):
     _write_file(target_file, modified_content)
 
 
-def _execute_simulation(design_copy_path):
-    cmd = f"cd {design_copy_path} && source execute-tests.sh"
+def _execute_simulation(run_sim_path, sim_command):
+    cmd = f"cd {run_sim_path} && {sim_command}"
     subprocess.run(
-        cmd, shell=True, capture_output=True, executable="/bin/bash", text=True
+        cmd, shell=True, executable="/bin/bash", capture_output=True, text=True
     )
 
 
-def _collect_simulation_results(design_copy_path, results_dir):
-    output_file = os.path.join(design_copy_path, "execute-tests-output.txt")
-    if os.path.exists(output_file):
+def _collect_simulation_results(
+    run_sim_path, results_dir, output_file, sim_result_path, log_glob
+):
+    output_path = os.path.join(run_sim_path, output_file)
+    if os.path.exists(output_path):
         subprocess.run(
-            f"cp {output_file} {results_dir}/", shell=True, executable="/bin/bash"
+            f"cp {output_path} {results_dir}/", shell=True, executable="/bin/bash"
         )
-    log_files_path = os.path.join(
-        design_copy_path, "verif/sim/out_*/veri-testharness_sim/*"
-    )
+
+    log_files_path = os.path.join(sim_result_path, log_glob)
     subprocess.run(
         f"cp {log_files_path} {results_dir}/ 2>/dev/null || true",
         shell=True,
@@ -86,51 +70,75 @@ def _collect_simulation_results(design_copy_path, results_dir):
     )
 
 
-def _clean_simulation_artifacts(design_copy_path):
-    output_file = os.path.join(design_copy_path, "execute-tests-output.txt")
-    subprocess.run(f"rm {output_file}", shell=True, executable="/bin/bash")
+def _clean_simulation_artifacts(
+    design_copy_path, output_file, sim_result_path, clean_commands
+):
+    # Remove output file
+    output_path = os.path.join(design_copy_path, output_file)
+    if os.path.exists(output_path):
+        os.remove(output_path)
 
-    sim_dir = f"{design_copy_path}/verif/sim"
-    subprocess.run(
-        f"cd {sim_dir} && make clean_all", shell=True, executable="/bin/bash"
-    )
-    subprocess.run(
-        f"cd {sim_dir} && rm logfile.log", shell=True, executable="/bin/bash"
-    )
-    subprocess.run(f"cd {sim_dir} && rm -rf out_*", shell=True, executable="/bin/bash")
+    # Run each clean command
+    for cmd in clean_commands:
+        subprocess.run(
+            f"cd {sim_result_path} && {cmd}", shell=True, executable="/bin/bash"
+        )
 
 
-def run_simulation(design_copy_path, mutation):
+def run_simulation(design_copy_path, mutation, config):
     design_copy_path = os.path.abspath(design_copy_path)
     file_path, mutation_data = mutation
-    target_file = f"{design_copy_path}/{file_path.split('/cva6/')[-1]}"
 
+    # The target file is in the design copy, with the same relative path as in the original
+    design_root_name = os.path.basename(config["design_root_path"])
+    relative_path = file_path.split(f"{design_root_name}/")[-1]
+    target_file = os.path.join(design_copy_path, relative_path)
+
+    # Create unique ID for this mutation
     unique_id = f"{os.path.basename(file_path)}_{mutation_data['mutation_type']}_{hash(mutation_data['original_code'])}"
     results_dir = os.path.join("results", unique_id)
     results_dir = os.path.abspath(results_dir)
     os.makedirs(results_dir, exist_ok=True)
 
+    # Backup original content, apply mutation
     original_content = read_file(target_file)
     _apply_mutation(target_file, mutation_data)
 
     print(f"-- Running simulation in {design_copy_path} with mutation in {target_file}")
-    _execute_simulation(design_copy_path)
-    _collect_simulation_results(design_copy_path, results_dir)
-    _clean_simulation_artifacts(design_copy_path)
+    _execute_simulation(config["run_sim_path"], config["sim_command"])
+    relative_path = config["sim_result_path"].split(f"{design_root_name}/")[-1]
+    sim_result_path = os.path.join(design_copy_path, relative_path)
+    _collect_simulation_results(
+        config["run_sim_path"],
+        results_dir,
+        config["output_file"],
+        sim_result_path,
+        config["log_glob"],
+    )
+    _clean_simulation_artifacts(
+        design_copy_path,
+        config["output_file"],
+        sim_result_path,
+        config["clean_commands"],
+    )
+
+    # Restore original content
     _write_file(target_file, original_content)
+
     return {unique_id: {"target_file": os.path.basename(file_path)} | mutation_data}
 
 
 def run_simulations():
     create_results_directory()
 
+    # Load configuration and mutations
     config = read_json("config.json")
-    design_root_path = config["design_root_path"]
-    # cmd = config["cmd"]
-    # sim_path = config["sim_path"]
-    # num_jobs = int(config["num_jobs"])
-
     mutations = read_json("mutations.json")
+
+    design_root_path = config["design_root_path"]
+    # num_jobs = int(config.get("num_jobs", 1)) # TODO: Implement multi-job support
+
+    # Prepare mutation tuples
     mutation_tuples = []
     for target_file, target_mutations in mutations.items():
         for target_mutation in target_mutations:
@@ -138,7 +146,7 @@ def run_simulations():
 
     total_mutations = len(mutation_tuples)
 
-    # Create design copies for parallel execution
+    # Create design copy
     design_copy_path = spawn_design_copy(design_root_path)
 
     print(f"-- Starting simulations for {total_mutations} mutations sequentially...")
@@ -150,7 +158,7 @@ def run_simulations():
 
     for mutation in mutation_tuples:
         try:
-            result = run_simulation(design_copy_path, mutation)
+            result = run_simulation(design_copy_path, mutation, config)
             results.update(result)
             completed_count += 1
             print(
