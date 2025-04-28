@@ -48,9 +48,7 @@ def _apply_mutation(target_file, mutation_data):
 
 def _execute_simulation(run_sim_path, sim_command):
     cmd = f"cd {run_sim_path} && {sim_command}"
-    subprocess.run(
-        cmd, shell=True, executable="/bin/bash", capture_output=True, text=True
-    )
+    subprocess.run(cmd, shell=True, executable="/bin/bash", capture_output=True)
 
 
 def _collect_simulation_results(
@@ -81,7 +79,10 @@ def _clean_simulation_artifacts(
     # Run each clean command
     for cmd in clean_commands:
         subprocess.run(
-            f"cd {sim_result_path} && {cmd}", shell=True, executable="/bin/bash"
+            f"cd {sim_result_path} && {cmd}",
+            shell=True,
+            executable="/bin/bash",
+            capture_output=True,
         )
 
 
