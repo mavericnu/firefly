@@ -71,12 +71,12 @@ def _collect_simulation_results(
 def _clean_simulation_artifacts(
     run_sim_path, output_file, sim_result_path, clean_commands
 ):
-    # Remove output file
+    # Remove output file.
     output_path = os.path.join(run_sim_path, output_file)
     if os.path.exists(output_path):
         os.remove(output_path)
 
-    # Run each clean command
+    # Run each clean command.
     for cmd in clean_commands:
         subprocess.run(
             f"cd {sim_result_path} && {cmd}",
@@ -90,40 +90,43 @@ def run_simulation(design_copy_path, mutation, config):
     design_copy_path = os.path.abspath(design_copy_path)
     file_path, mutation_data = mutation
 
-    # The target file is in the design copy, with the same relative path as in the original
+    # Update paths to be relative to design copy.
     design_root_name = os.path.basename(config["design_root_path"])
     relative_path = file_path.split(f"{design_root_name}/")[-1]
     target_file = os.path.join(design_copy_path, relative_path)
+    relative_path = config["run_sim_path"].split(f"{design_root_name}/")[-1]
+    run_sim_path = os.path.join(design_copy_path, relative_path)
+    relative_path = config["sim_result_path"].split(f"{design_root_name}/")[-1]
+    sim_result_path = os.path.join(design_copy_path, relative_path)
 
-    # Create unique ID for this mutation
+    # Create unique ID for this mutation.
     unique_id = f"{os.path.basename(file_path)}_{mutation_data['mutation_type']}_{hash(mutation_data['original_code'])}"
     results_dir = os.path.join("results", unique_id)
     results_dir = os.path.abspath(results_dir)
     os.makedirs(results_dir, exist_ok=True)
 
-    # Backup original content, apply mutation
+    # Backup original content, apply mutation.
     original_content = read_file(target_file)
     _apply_mutation(target_file, mutation_data)
 
     print(f"-- Running simulation in {design_copy_path} with mutation in {target_file}")
-    _execute_simulation(config["run_sim_path"], config["sim_command"])
-    relative_path = config["sim_result_path"].split(f"{design_root_name}/")[-1]
-    sim_result_path = os.path.join(design_copy_path, relative_path)
+    _execute_simulation(run_sim_path, config["sim_command"])
+
     _collect_simulation_results(
-        config["run_sim_path"],
+        run_sim_path,
         results_dir,
         config["output_file"],
         sim_result_path,
         config["log_glob"],
     )
     _clean_simulation_artifacts(
-        config["run_sim_path"],
+        run_sim_path,
         config["output_file"],
         sim_result_path,
         config["clean_commands"],
     )
 
-    # Restore original content
+    # Restore original content.
     _write_file(target_file, original_content)
 
     return {unique_id: {"target_file": os.path.basename(file_path)} | mutation_data}
@@ -132,14 +135,14 @@ def run_simulation(design_copy_path, mutation, config):
 def run_simulations():
     create_results_directory()
 
-    # Load configuration and mutations
+    # Load configuration and mutations.
     config = read_json("config.json")
     mutations = read_json("mutations.json")
 
     design_root_path = config["design_root_path"]
     # num_jobs = int(config.get("num_jobs", 1)) # TODO: Implement multi-job support
 
-    # Prepare mutation tuples
+    # Prepare mutation tuples.
     mutation_tuples = []
     for target_file, target_mutations in mutations.items():
         for target_mutation in target_mutations:
@@ -147,12 +150,12 @@ def run_simulations():
 
     total_mutations = len(mutation_tuples)
 
-    # Create design copy
+    # Create design copy.
     design_copy_path = spawn_design_copy(design_root_path)
 
     print(f"-- Starting simulations for {total_mutations} mutations sequentially...")
 
-    # Execute simulations iteratively
+    # Execute simulations iteratively.
     results = {}
     completed_count = 0
     failed_count = 0
@@ -166,7 +169,7 @@ def run_simulations():
                 f"-- Progress: {completed_count}/{total_mutations} simulations completed."
             )
 
-            # Dump intermediate results every 5 mutations
+            # Dump intermediate results every 5 mutations.
             if completed_count % 5 == 0:
                 ids_file_path = os.path.join("results", "ids.json")
                 with open(ids_file_path, "w", encoding="utf-8") as f:
