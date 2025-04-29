@@ -90,30 +90,15 @@ def _clean_simulation_artifacts(
         )
 
 
-def get_relative_path(path, design_root_name):
-    if design_root_name in path:
-        parts = path.split(design_root_name)
-        if len(parts) > 1 and parts[1]:
-            return parts[1][1:] if parts[1].startswith("/") else parts[1]
-    return ""
-
-
 def run_simulation(design_copy_path, mutation, config):
     design_copy_path = os.path.abspath(design_copy_path)
     file_path, mutation_data = mutation
 
     # Update paths to be relative to design copy.
-    design_root_name = os.path.basename(config["design_root_path"])
-
-    # Update paths to be relative to design copy.
-    relative_file_path = get_relative_path(file_path, design_root_name)
-    target_file = os.path.join(design_copy_path, relative_file_path)
-
-    run_sim_relative_path = get_relative_path(config["run_sim_path"], design_root_name)
-    run_sim_path = os.path.join(design_copy_path, run_sim_relative_path)
-
-    sim_result_relative_path = get_relative_path(config["sim_result_path"], design_root_name)
-    sim_result_path = os.path.join(design_copy_path, sim_result_relative_path)
+    design_root_path = config["design_root_path"]
+    target_file = file_path.replace(design_root_path, design_copy_path)
+    run_sim_path = config["run_sim_path"].replace(design_root_path, design_copy_path)
+    sim_result_path = config["sim_result_path"].replace(design_root_path, design_copy_path)
 
     # Create unique ID for this mutation.
     unique_id = f"{os.path.basename(file_path)}_{mutation_data['mutation_type']}_{hash(mutation_data['original_code'])}"
