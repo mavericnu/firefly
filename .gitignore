@@ -1,9 +1,9 @@
-# API Keys
-.setup_keys.sh
+# Simulation directory
+sim/
 
-# Local folders
-dut
-buffers
+# Local JSON files
+config.json
+mutations.json
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
