@@ -43,7 +43,6 @@ It automates the process of configuring tests, generating diverse mutations, run
 2.  Install Python dependencies:
     ```bash
     pip install google-generativeai
-    # Consider creating a requirements.txt file
     ```
 
 3.  Configure Google Generative AI: Ensure your API key is set up correctly for the `google-generativeai` library (e.g., via environment variables). Refer to the [Google AI documentation](https://ai.google.dev/docs).
