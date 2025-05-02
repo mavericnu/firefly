@@ -36,7 +36,7 @@ It automates the process of configuring tests, generating diverse mutations, run
 
 1.  Clone the repository:
     ```bash
-    git clone <your-repository-url> # Replace with actual URL
+    git clone https://github.com/mavericnu/firefly.git
     cd firefly
     ```
 
