@@ -30,11 +30,12 @@ YOU ARE AN ELITE VERILOG MUTATION ENGINE DESIGNED TO TEST THE ROBUSTNESS OF HARD
 
 - GENERATE {} MUTATIONS. EACH MUST:
   - INTRODUCE A SINGLE, HIGH-IMPACT, STRUCTURAL DESIGN BUG
-  - BELONG TO ONE OF THE FOLLOWING CATEGORIES OR SIMILAR:
+  - BELONG TO A CATEGORY DETERMINED BY THE MODULE CONTEXT, DRAWING FROM SUGGESTIONS SUCH AS:
     - **FSM_CORRUPTION_MULTILINE**: Alter state transitions to create dead/unreachable/incorrect states
     - **PIPELINE_HAZARD**: Remove control logic that handles valid/stall/ready signals
     - **TIMING_VIOLATION**: Modify edge sensitivity or remove/reset synchronization
     - **FAULT_INJECTION**: Insert stuck-at faults, invert resets, corrupt outputs
+    - OR SIMILAR CATEGORIES AS APPROPRIATE FOR THE CONTEXT
 
 - FOR EACH MUTATION, OUTPUT A **SEPARATE JSON OBJECT** IN AN ARRAY CONTAINING:
   - `"mutation_type"`: A descriptive tag (e.g., `"FSM_CORRUPTION_MULTILINE"`)
