@@ -57,7 +57,7 @@ def prompt_model(content):
 request_timestamps = deque()
 
 
-def _generate_mutations_batch(tasks_to_process, mutations):
+def _generate_mutations_batch(tasks_to_process, mutations, additional_requirements):
     failed_tasks = []
     global request_timestamps
 
@@ -88,7 +88,7 @@ def _generate_mutations_batch(tasks_to_process, mutations):
             )
             file_content = read_file(file_path)
             prompt = PROMPT.format(
-                file_path.split("/")[-1], file_content, mutations_to_request
+                file_path.split("/")[-1], file_content, mutations_to_request, additional_requirements
             )
             file_mutations_result = prompt_model(prompt)
             validated_result = validate_mutations(file_path, file_mutations_result)
@@ -118,6 +118,7 @@ def spawn_mutations():
     config = read_json("config.json")
     target_files = config["target_files"]
     num_mutations = int(config["num_mutations"])
+    additional_requirements = config["additional_requirements"]
     files_count = len(target_files)
     mutations = {}
 
@@ -150,7 +151,7 @@ def spawn_mutations():
         else:
             print(f"-- Starting initial processing for {len(tasks_to_process)} tasks.")
 
-        failed_tasks = _generate_mutations_batch(tasks_to_process, mutations)
+        failed_tasks = _generate_mutations_batch(tasks_to_process, mutations, additional_requirements)
         tasks_to_process = failed_tasks
         retries += 1
 

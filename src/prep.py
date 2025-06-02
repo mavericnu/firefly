@@ -74,7 +74,7 @@ def get_simulation_parameters():
         "Enter the absolute path to the directory from which to run the clean commands: "
     )
     num_jobs = input("How many simulations to run in parallel?: ")
-    additional_comments = input(
+    additional_requirements = input(
         "Enter any additional requirements for mutations to be applied or leave blank: "
     )
     return (
@@ -87,7 +87,7 @@ def get_simulation_parameters():
         clean_commands,
         clean_path,
         num_jobs,
-        additional_comments,
+        additional_requirements,
     )
 
 
@@ -116,7 +116,7 @@ def prep_simulation():
         clean_commands,
         clean_path,
         num_jobs,
-        additional_comments,
+        additional_requirements,
     ) = get_simulation_parameters()
 
     config = {
@@ -131,7 +131,7 @@ def prep_simulation():
         "clean_path": str(clean_path),
         "num_jobs": num_jobs,
         "target_files": sv_files,
-        "additional_comments": additional_comments,
+        "additional_requirements": additional_requirements,
     }
     generate_json_config(config)
     create_simulation_directory()
