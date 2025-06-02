@@ -64,6 +64,9 @@ def _collect_simulation_results(
             f"cp {output_path} {results_dir}/", shell=True, executable="/bin/bash"
         )
 
+    if not log_glob:
+        return
+
     log_files_path = os.path.join(sim_result_path, log_glob)
     subprocess.run(
         f"cp {log_files_path} {results_dir}/ 2>/dev/null || true",
