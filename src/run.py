@@ -52,14 +52,14 @@ def _apply_mutation(target_file, mutation_data):
 
 def _execute_simulation(run_sim_path, sim_command):
     cmd = f"cd {run_sim_path} && {sim_command}"
-    subprocess.run(cmd, shell=True, executable="/bin/bash", capture_output=True)
+    subprocess.run(cmd, shell=True, executable="/bin/bash")
 
 
 def _collect_simulation_results(
     run_sim_path, results_dir, output_file, sim_result_path, log_glob
 ):
     output_path = os.path.join(run_sim_path, output_file)
-    if os.path.exists(output_path):
+    if os.path.exists(output_path) and os.path.isfile(output_path):
         subprocess.run(
             f"cp {output_path} {results_dir}/", shell=True, executable="/bin/bash"
         )
@@ -72,21 +72,18 @@ def _collect_simulation_results(
     )
 
 
-def _clean_simulation_artifacts(
-    run_sim_path, output_file, sim_result_path, clean_commands
-):
+def _clean_simulation_artifacts(run_sim_path, output_file, clean_path, clean_commands):
     # Remove output file.
     output_path = os.path.join(run_sim_path, output_file)
-    if os.path.exists(output_path):
+    if os.path.exists(output_path) and os.path.isfile(output_path):
         os.remove(output_path)
 
     # Run each clean command.
     for cmd in clean_commands:
         subprocess.run(
-            f"cd {sim_result_path} && {cmd}",
+            f"cd {clean_path} && {cmd}",
             shell=True,
             executable="/bin/bash",
-            capture_output=True,
         )
 
 
@@ -99,6 +96,7 @@ def run_simulation(design_copy_path, mutation, config):
     target_file = file_path.replace(design_root_path, design_copy_path)
     run_sim_path = config["run_sim_path"].replace(design_root_path, design_copy_path)
     sim_result_path = config["sim_result_path"].replace(design_root_path, design_copy_path)
+    clean_path = config["clean_path"].replace(design_root_path, design_copy_path)
 
     # Create unique ID for this mutation.
     unique_id = f"{os.path.basename(file_path)}_{mutation_data['mutation_type']}_{hash(mutation_data['original_code'])}"
@@ -123,7 +121,7 @@ def run_simulation(design_copy_path, mutation, config):
     _clean_simulation_artifacts(
         run_sim_path,
         config["output_file"],
-        sim_result_path,
+        clean_path,
         config["clean_commands"],
     )
 

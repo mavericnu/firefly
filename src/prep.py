@@ -70,7 +70,13 @@ def get_simulation_parameters():
     clean_commands = input(
         "Enter the commands separated by semicolons to clean simulation artifacts: "
     ).split(";")
+    clean_path = input(
+        "Enter the absolute path to the directory from which to run the clean commands: "
+    )
     num_jobs = input("How many simulations to run in parallel?: ")
+    additional_comments = input(
+        "Enter any additional requirements for mutations to be applied or leave blank: "
+    )
     return (
         num_mutations,
         sim_command,
@@ -79,7 +85,9 @@ def get_simulation_parameters():
         output_file,
         log_glob,
         clean_commands,
+        clean_path,
         num_jobs,
+        additional_comments,
     )
 
 
@@ -106,7 +114,9 @@ def prep_simulation():
         output_file,
         log_glob,
         clean_commands,
+        clean_path,
         num_jobs,
+        additional_comments,
     ) = get_simulation_parameters()
 
     config = {
@@ -118,8 +128,10 @@ def prep_simulation():
         "output_file": output_file,
         "log_glob": log_glob,
         "clean_commands": clean_commands,
+        "clean_path": str(clean_path),
         "num_jobs": num_jobs,
         "target_files": sv_files,
+        "additional_comments": additional_comments,
     }
     generate_json_config(config)
     create_simulation_directory()
