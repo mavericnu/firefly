@@ -140,7 +140,7 @@ YOU ARE AN ELITE VERILOG MUTATION ENGINE DESIGNED TO TEST THE ROBUSTNESS OF HARD
   - `"mutation_type"`: A descriptive tag (e.g., `"FSM_CORRUPTION_MULTILINE"`)
   - `"original_code"`: Full, unmodified snippet to match (including indentation and line breaks)
   - `"mutated_code"`: Snippet with exactly one mutation applied (must preserve structure)
-  - `"bug_description"`: A one-line explanation of the bug’s *functional* impact (e.g., “State EXEC becomes unreachable due to incorrect transition.”)
+  - `"bug_description"`: A one-line explanation of the bug's *functional* impact (e.g., “State EXEC becomes unreachable due to incorrect transition.”)
   - `"fix_comment"`: A one-line fix suggestion (e.g., “Restore transition from LOAD to EXEC on data_ready.”)
 
 - EACH MUTATION MUST BE **INDEPENDENT** (do not reuse or alter overlapping lines or signals) AND **REALISTIC AND SEMANTICALLY RELEVANT**
@@ -201,13 +201,13 @@ end
 <ASSISTANT RESPONSE>
 ```json
 [
-  {
+  {{
     "mutation_type": "FSM_CORRUPTION_MULTILINE",
     "original_code": "      LOAD: begin\\n        if (data_ready)\\n          state <= EXEC;\\n        else\\n          state <= LOAD;\\n      end",
     "mutated_code": "      LOAD: begin\\n        if (data_ready)\\n          state <= LOAD;\\n        else\\n          state <= IDLE;\\n      end",
     "bug_description": "State EXEC becomes unreachable, preventing computation stage from ever executing.",
     "fix_comment": "Restore transition to EXEC when data_ready is high."
-  }
+  }}
 ]
 ```
 </ASSISTANT RESPONSE>
