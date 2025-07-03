@@ -5,7 +5,7 @@ import re
 import time
 
 from collections import deque
-from src.constants import RATE_LIMIT, TIME_WINDOW, MAX_RETRIES, PROMPT
+from src.constants import RATE_LIMIT, TIME_WINDOW, MAX_RETRIES, FUNCTIONAL_BUGS_PROMPT 
 
 
 # Set up API client.
@@ -87,7 +87,7 @@ def _generate_mutations_batch(tasks_to_process, mutations, additional_requiremen
                 f"-- Attempting: {file_path}, requesting {mutations_to_request} mutations."
             )
             file_content = read_file(file_path)
-            prompt = PROMPT.format(
+            prompt = FUNCTIONAL_BUGS_PROMPT.format(
                 file_path.split("/")[-1], file_content, mutations_to_request, additional_requirements
             )
             file_mutations_result = prompt_model(prompt)
